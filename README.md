@@ -2,7 +2,7 @@
 
 在 iPhone 上集中查看 Sub2API 套餐、反代上游账号与其他 API 额度。使用 Expo / React Native 开发，Windows 可开发和预览，通过 GitHub macOS 构建未签名 IPA，自行签名安装。
 
-本项目采用 MIT 许可证开源。源码与正式版本统一在 `Suxifang/QuotaDeck` 维护；下载 IPA 请前往本仓库的 [Releases](https://github.com/Suxifang/QuotaDeck/releases/latest)。安装方法见 [安装与更新](docs/RELEASE_README.md)。
+本项目采用 MIT 许可证开源。源码与正式版本统一在 `Suxifang/Yudu` 维护；下载 IPA 请前往本仓库的 [Releases](https://github.com/Suxifang/Yudu/releases/latest)。安装方法见 [安装与更新](docs/RELEASE_README.md)。
 
 ## 已实现
 
@@ -14,7 +14,8 @@
 - 区分后台采样与手机查询时间。采样过旧、缺少采样时间或已过重置时间时明确提示，不虚构重置后的额度。
 - iOS 凭据存入系统钥匙串，后台密码不落盘；导出配置不含凭据。网页预览凭据只保留在当前页面内存中。
 - 明确标识、独立于真实账号的演示模式。
-- 「设置 → 版本更新」读取本仓库 Releases 的正式版；支持更新说明、下载进度、取消、大小与 SHA-256 校验，以及系统分享导入 LCSign。可选每六小时的前台自动检查，默认关闭。
+- 设置顶部的「软件更新」与主页右上角更新入口读取本仓库 Releases 的正式版；支持更新说明、下载进度、取消、大小与 SHA-256 校验，以及系统分享导入 LCSign。可选每六小时的前台自动检查，默认关闭。
+- 总览、连接与设置支持原生左右滑动，点按底栏平滑过渡，透镜跟随手势，各页保留浏览位置。iPhone 开放 ProMotion 高刷新率支持，兼容设备最高 120Hz，由系统结合电量和温度调度。
 - iOS 小号桌面卡片、中号多账号卡片及矩形锁屏小组件；置顶优先，可选关注账号，点击进入对应详情。应用查询后同步，15 分钟后或已过重置时间标记待更新。应用关闭后暂不主动抓取额度。
 
 ## 本机预览
@@ -31,11 +32,11 @@ npm run web
 
 普通用户可从本仓库的 Releases 下载 `Yudu-版本号.ipa` 与 `SHA256SUMS.txt`，使用自己的签名方式安装。
 
-开发者推送 `main` 或手动运行 **Check and build iOS** 工作流。检查通过后，macOS 会生成原生项目、编译 Release，并将 `QuotaDeck-unsigned.ipa` 上传至 **QuotaDeck-unsigned-IPA** 构建附件。构建附件用于验证；正式发布使用 [发布流程](docs/UPDATES.md)，标签绑定产生该 IPA 的源码提交。
+开发者推送 `main` 或手动运行 **Check and build iOS** 工作流。检查通过后，macOS 会生成原生项目、编译 Release，并将 `Yudu-unsigned.ipa` 上传至 **Yudu-unsigned-IPA** 构建附件。构建附件用于验证；正式发布使用 [发布流程](docs/UPDATES.md)，标签绑定产生该 IPA 的源码提交。
 
 构建不需要 Apple 开发者账号、Expo 账号或签名证书。未签名 IPA 无法直接安装，需自行签名。最低系统版本由 Expo 58 原生依赖约束（当前为 iOS 16.4）；原生玻璃效果需要 iOS 26。
 
-小组件随 IPA 一起提供，包含独立扩展及共享 App Group。自签时需同时签署主应用与扩展，并保留相同的 App Group 权限（`group.app.quotadeck.mobile`）；仅给主应用签名或移除该权限会使小组件无法共享数据。iOS 17 起可长按每个小组件单独选账号；较低版本可在应用设置内选择。真实 iPhone 的小组件显示与签名兼容性仍需安装后确认。
+小组件随 IPA 一起提供，包含独立扩展及共享 App Group。连接真实账号后，在「设置 → 桌面与锁屏小组件」点“立即同步”，可看到共享空间写入结果；演示数据不会同步。自签时需同时签署主应用与扩展，并保留相同的 App Group 权限（`group.app.quotadeck.mobile`）；仅给主应用签名或移除该权限会使小组件无法共享数据。iOS 17 起可长按每个小组件单独选账号；较低版本可在应用设置内选择。真实 iPhone 的小组件显示与签名兼容性仍需安装后确认。
 
 ## 检查
 
@@ -54,7 +55,9 @@ npm run build:web
 
 所有源码、依赖、本机参考克隆、缓存及生成附件均放在本项目文件夹内；缓存、凭据与构建产物不提交到 GitHub。
 
-本地生成产物不进入 Git 源码树；正式 IPA 仅作为本仓库 Releases 的附件提供。原 `Yudu-Releases` 仓库保留 0.2.0 → 0.2.1 过渡升级，后续只维护本仓库。
+本地生成产物不进入 Git 源码树；正式 IPA 仅作为本仓库 Releases 的附件提供。项目只维护这一个公开仓库。
+
+已安装 0.2.0 或 0.2.1 的用户，请手动从本仓库 Releases 下载并覆盖安装 0.2.2 或更新版本一次，以启用最终的应用内更新地址。
 
 ## 品牌与发行
 

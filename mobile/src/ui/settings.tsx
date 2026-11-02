@@ -30,7 +30,7 @@ export function Settings({ controller }: { controller: QuotaController }) {
       const json = configurationExport(controller.saved);
       if (Platform.OS === 'web') { await Clipboard.setStringAsync(json); setToast('配置已复制，凭据未包含在内'); }
       else {
-        const file = new File(Paths.cache, 'QuotaDeck-config.json'); file.write(json);
+        const file = new File(Paths.cache, 'Yudu-config.json'); file.write(json);
         if (await Sharing.isAvailableAsync()) await Sharing.shareAsync(file.uri, { mimeType: 'application/json', UTI: 'public.json' });
         else { await Clipboard.setStringAsync(json); setToast('配置已复制'); }
       }
@@ -38,6 +38,10 @@ export function Settings({ controller }: { controller: QuotaController }) {
   }
   return <>
     <View style={{ gap: 9 }}><Text style={{ color: t.muted, fontSize: 10, letterSpacing: 2 }}>PREFERENCES</Text><Text style={{ fontSize: 29, color: t.ink, fontWeight: '700', letterSpacing: -1 }}>按你的习惯。</Text><Text style={{ color: t.secondary, fontSize: 12, lineHeight: 20 }}>让余度，成为顺手的小工具。</Text></View>
+    <Glass style={{ padding: 20, gap: 16 }}>
+      <View style={[styles.row, { gap: 13 }]}><Logo size={44} /><View style={{ flex: 1, gap: 5 }}><Text style={{ color: t.ink, fontSize: 16, fontWeight: '600' }}>软件更新</Text><Text style={{ color: updates.release ? t.accent : t.secondary, fontSize: 11 }}>{updates.release ? `新版本 ${updates.release.version} 可用` : `余度 Yudu · 当前 ${APP_VERSION}`}</Text></View></View>
+      <Button title={updates.release ? '查看并下载更新' : '检查更新'} icon={ArrowDownToLine} onPress={() => { setInfo('updates'); if (!updates.release) void updates.check(); }} />
+    </Glass>
     <Glass style={{ padding: 21, gap: 20 }}>
       <View style={[styles.row, { gap: 9 }]}><Droplets size={18} color={t.accent} /><Text style={{ color: t.ink, fontSize: 14, fontWeight: '600' }}>外观</Text><Text style={{ color: t.muted, fontSize: 10 }}>Liquid Glass</Text></View>
       <Segments<Preferences['theme']> options={[{ value: 'light', label: '浅色' }, { value: 'dark', label: '深色' }, { value: 'system', label: '跟随系统' }]} value={prefs.theme} onChange={theme => controller.changePreferences({ theme })} />
@@ -54,8 +58,6 @@ export function Settings({ controller }: { controller: QuotaController }) {
       <View style={[styles.between, { borderTopWidth: 1, borderColor: t.line, paddingTop: 16 }]}><Text style={{ color: t.ink, fontSize: 13 }}>轻触反馈</Text><Switch accessibilityLabel="轻触反馈" value={prefs.haptics} onValueChange={haptics => controller.changePreferences({ haptics })} trackColor={{ true: t.accent }} /></View>
     </Glass>
     <Glass style={{ paddingHorizontal: 20, borderRadius: 26 }}>
-      <SectionLink title="版本更新" subtitle={updates.release ? `发现新版本 ${updates.release.version}` : `当前 ${APP_VERSION} · 下载并导入 LCSign`} icon={RefreshCw} onPress={() => setInfo('updates')} />
-      <View style={{ height: 1, backgroundColor: t.line }} />
       <SectionLink title="桌面与锁屏小组件" subtitle="抬眼查看余量，选择你关注的账号" icon={LayoutGrid} onPress={() => setInfo('widgets')} />
       <View style={{ height: 1, backgroundColor: t.line }} />
       <SectionLink title="导出站点配置" subtitle="方便留存，导出内容不含密钥与登录状态" icon={ArrowDownToLine} onPress={() => void exportConfig()} />
@@ -66,7 +68,7 @@ export function Settings({ controller }: { controller: QuotaController }) {
     {toast ? <Text accessibilityRole="alert" style={{ color: t.accent, fontSize: 12, textAlign: 'center' }}>{toast}</Text> : null}
     <Pressable accessibilityRole="button" onPress={controller.isDemo ? controller.exitDemo : controller.enterDemo} style={[styles.row, { justifyContent: 'center', gap: 7, padding: 10 }]}><FlaskConical color={t.secondary} size={15} /><Text style={{ color: t.secondary, fontSize: 12 }}>{controller.isDemo ? '退出演示模式' : '查看演示模式'}</Text></Pressable>
     <View style={{ alignItems: 'center', gap: 10, paddingTop: 3 }}><Logo size={32} /><Text style={{ color: t.muted, fontSize: 10 }}>余度 Yudu · {APP_VERSION}</Text></View>
-    {info ? <Sheet visible title={info === 'privacy' ? '数据与隐私' : info === 'credits' ? '开源致谢' : info === 'widgets' ? '桌面与锁屏' : info === 'updates' ? '版本更新' : '清空余量记录'} onClose={() => setInfo(undefined)}>
+    {info ? <Sheet visible title={info === 'privacy' ? '数据与隐私' : info === 'credits' ? '开源致谢' : info === 'widgets' ? '桌面与锁屏' : info === 'updates' ? '软件更新' : '清空余量记录'} onClose={() => setInfo(undefined)}>
       {info === 'updates' ? <UpdateSettings /> : info === 'widgets' ? <WidgetSettings controller={controller} /> : info === 'privacy' ? <>
         <Info title="直接连接你的站点" text="应用从手机直接查询你添加的接口。没有余度中转服务器，不需要注册账号。" />
         <Info title="凭据留在本机" text="iOS 密钥与登录状态保存在系统钥匙串，设备解锁后可读；后台密码仅用于登录。网页预览的凭据只保留在当前页面内存中。" />

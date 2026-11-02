@@ -44,4 +44,4 @@ def validate_ipa(path, version, build):
 if __name__ == '__main__':
     root = Path(__file__).resolve().parents[1]
     config = json.loads((root / 'mobile/app.json').read_text(encoding='utf-8'))['expo']
-    print(json.dumps(validate_ipa(sys.argv[1] if len(sys.argv) > 1 else root / 'artifacts/QuotaDeck-unsigned.ipa', config['version'], config['ios']['buildNumber']), ensure_ascii=False))
+    print(json.dumps(validate_ipa(sys.argv[1] if len(sys.argv) > 1 else root / 'artifacts/Yudu-unsigned.ipa', config['version'], config['ios']['buildNumber']), ensure_ascii=False))

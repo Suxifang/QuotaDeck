@@ -1,13 +1,12 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { AccessibilityInfo, Animated, Platform, Pressable, Text, View, type ViewStyle } from 'react-native';
-import { usePathname, useRouter } from 'expo-router';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Animated, Platform, Pressable, Text, View, type ViewStyle } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { GlassView } from 'expo-glass-effect';
 import { LinearGradient } from 'expo-linear-gradient';
 import { LayoutGrid, Link2, Settings2 } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuotaController } from '../state/context';
-import { tap, useGlassPreferences } from './primitives';
+import { tap, useGlassPreferences, useReduceMotion } from './primitives';
 import { useTheme } from './theme';
 
 const tabs = [
@@ -17,47 +16,32 @@ const tabs = [
 ] as const;
 
 // The dock lives above the route outlet so one lens survives every tab change.
-export function LiquidDock() {
+export function LiquidDock({ index, progress, onSelect }: { index: number; progress: Animated.AnimatedInterpolation<number>; onSelect: (index: number) => void }) {
   const t = useTheme(); const insets = useSafeAreaInsets();
   const controller = useQuotaController();
-  const pathname = usePathname(); const router = useRouter();
-  const index = Math.max(0, tabs.findIndex(tab => tab.path === pathname));
   const { reduce, liquid } = useGlassPreferences();
-  const [reduceMotion, setReduceMotion] = useState(false);
+  const reduceMotion = useReduceMotion();
   const [width, setWidth] = useState(0);
-  const previousWidth = useRef(0);
-  const [position] = useState(() => new Animated.Value(0));
   const [stretch] = useState(() => new Animated.Value(1));
   const [press] = useState(() => new Animated.Value(1));
   const cell = Math.max(0, (width - 14) / tabs.length);
+  const translation = useMemo(() => Animated.multiply(progress, cell), [progress, cell]);
+  const scale = useMemo(() => Animated.multiply(stretch, press), [stretch, press]);
 
   useEffect(() => {
-    AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion).catch(() => {});
-    const subscription = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotion);
-    return () => subscription.remove();
-  }, []);
-
-  useLayoutEffect(() => {
-    position.stopAnimation(); stretch.stopAnimation();
-    if (reduceMotion || previousWidth.current !== width) {
-      position.setValue(index * cell); stretch.setValue(1);
-    } else {
-      Animated.parallel([
-        Animated.spring(position, { toValue: index * cell, stiffness: 240, damping: 23, mass: .85, useNativeDriver: true }),
-        Animated.sequence([
-          Animated.timing(stretch, { toValue: 1.065, duration: 90, useNativeDriver: true }),
-          Animated.spring(stretch, { toValue: 1, stiffness: 280, damping: 18, mass: .65, useNativeDriver: true }),
-        ]),
-      ]).start();
-    }
-    previousWidth.current = width;
-    return () => { position.stopAnimation(); stretch.stopAnimation(); };
-  }, [index, cell, width, position, stretch, reduceMotion]);
+    stretch.stopAnimation();
+    if (reduceMotion) stretch.setValue(1);
+    else Animated.sequence([
+          Animated.timing(stretch, { toValue: 1.065, duration: 90, useNativeDriver: Platform.OS !== 'web' }),
+          Animated.spring(stretch, { toValue: 1, stiffness: 280, damping: 18, mass: .65, useNativeDriver: Platform.OS !== 'web' }),
+    ]).start();
+    return () => stretch.stopAnimation();
+  }, [index, stretch, reduceMotion]);
 
   function compress(value: number) {
     press.stopAnimation();
     if (reduceMotion) press.setValue(1);
-    else Animated.spring(press, { toValue: value, stiffness: 350, damping: 24, mass: .5, useNativeDriver: true }).start();
+    else Animated.spring(press, { toValue: value, stiffness: 350, damping: 24, mass: .5, useNativeDriver: Platform.OS !== 'web' }).start();
   }
 
   const web = Platform.OS === 'web' && !reduce ? { backdropFilter: 'blur(30px) saturate(145%)', WebkitBackdropFilter: 'blur(30px) saturate(145%)' } as ViewStyle : {};
@@ -76,14 +60,14 @@ export function LiquidDock() {
         position: 'absolute', left: 7, top: 6, bottom: 6, width: cell, borderRadius: 29, borderCurve: 'continuous',
         backgroundColor: reduce ? t.selected : t.lens, borderWidth: 1, borderColor: t.lensRim,
         boxShadow: t.dark ? '0px 3px 12px rgba(0,0,0,0.15)' : '0px 3px 12px rgba(42,77,52,0.09)',
-        transform: [{ translateX: position }, { scaleX: Animated.multiply(stretch, press) }, { scaleY: press }],
+        transform: [{ translateX: translation }, { scaleX: scale }, { scaleY: press }],
       }}>
         {liquid ? <GlassView glassEffectStyle="clear" tintColor={t.glassTint} colorScheme={t.dark ? 'dark' : 'light'} style={lensSurface} /> : null}
         {!reduce ? <LinearGradient pointerEvents="none" colors={t.dark ? ['rgba(240,255,235,0.16)', 'rgba(240,255,235,0.015)', 'rgba(240,255,235,0.08)'] : ['rgba(255,255,255,0.58)', 'rgba(255,255,255,0.03)', 'rgba(255,255,255,0.22)']} locations={[0, .52, 1]} style={[lensSurface, { overflow: 'hidden' }]} /> : null}
       </Animated.View> : null}
       {tabs.map((tab, tabIndex) => <Pressable key={tab.path} accessibilityRole="tab" accessibilityLabel={tab.label} accessibilityState={{ selected: index === tabIndex }} aria-selected={index === tabIndex}
         onPressIn={() => compress(.955)} onPressOut={() => compress(1)}
-        onPress={() => { tap(controller.data.preferences.haptics); if (pathname !== tab.path) router.replace(tab.path); }}
+        onPress={() => { tap(controller.data.preferences.haptics); onSelect(tabIndex); }}
         style={{ flex: 1, minHeight: 56, gap: 4, alignItems: 'center', justifyContent: 'center', borderRadius: 29 }}>
         <tab.icon size={20} strokeWidth={index === tabIndex ? 1.9 : 1.65} color={index === tabIndex ? t.ink : t.secondary} />
         <Text style={{ fontSize: 10, fontWeight: index === tabIndex ? '600' : '400', color: index === tabIndex ? t.ink : t.secondary }}>{tab.label}</Text>

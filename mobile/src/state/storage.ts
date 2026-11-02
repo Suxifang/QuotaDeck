@@ -41,7 +41,7 @@ export async function deleteCredential(connectionId: string): Promise<void> {
 }
 
 export function configurationExport(data: SavedData): string {
-  return JSON.stringify({ app: 'QuotaDeck', version: 1, exportedAt: new Date().toISOString(),
+  return JSON.stringify({ app: 'Yudu', version: 1, exportedAt: new Date().toISOString(),
     sources: data.sources.map(({ id, connectionId, name, baseUrl, kind, resolvedKind, accountId, pinned, enabled, custom }) => ({ id, connectionId, name, baseUrl, kind, resolvedKind, accountId, pinned, enabled, custom })),
     preferences: data.preferences }, null, 2);
 }

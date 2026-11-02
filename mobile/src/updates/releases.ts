@@ -1,4 +1,4 @@
-export const RELEASE_REPOSITORY = 'Suxifang/QuotaDeck';
+export const RELEASE_REPOSITORY = 'Suxifang/Yudu';
 export const RELEASES_URL = `https://github.com/${RELEASE_REPOSITORY}/releases`;
 export const LATEST_RELEASE_API = `https://api.github.com/repos/${RELEASE_REPOSITORY}/releases/latest`;
 export const AUTO_CHECK_INTERVAL = 6 * 60 * 60 * 1000;

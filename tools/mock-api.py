@@ -36,5 +36,5 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(200, {'data': {'balance': 28.64}})
         return self.send(404, {})
 
-print('QuotaDeck mock API: http://127.0.0.1:8091', flush=True)
+print('Yudu mock API: http://127.0.0.1:8091', flush=True)
 ThreadingHTTPServer(('127.0.0.1', 8091), Handler).serve_forever()

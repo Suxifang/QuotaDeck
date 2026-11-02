@@ -8,14 +8,14 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-REPO_NAME = 'QuotaDeck'
+REPO_NAME = 'Yudu'
 
 
 def public_repo(api, owner):
     repo = f'{owner}/{REPO_NAME}'
     result = api('/repos/' + repo)
     if result['private'] or result['full_name'].lower() != repo.lower():
-        raise RuntimeError('Expected the public QuotaDeck source and release repository')
+        raise RuntimeError('Expected the public Yudu source and release repository')
     return repo
 
 
@@ -83,7 +83,7 @@ def publish(api, opener, token, owner, root, run_id):
     version = config['version']; build = config['ios']['buildNumber']
     if not re.fullmatch(r'(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)', version):
         raise RuntimeError('Expected a stable semantic version')
-    path = root / 'artifacts/QuotaDeck-unsigned.ipa'
+    path = root / 'artifacts/Yudu-unsigned.ipa'
     downloaded = json.loads((root / '.cache/ipa-download.json').read_text(encoding='utf-8'))
     digest = hashlib.sha256(path.read_bytes()).hexdigest()
     if str(downloaded['runId']) != str(run_id) or downloaded['headSha'] != run['head_sha'] or downloaded['sha256'] != digest:

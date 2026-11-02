@@ -1,17 +1,18 @@
 {
   "expo": {
-    "name": "QuotaDeck",
-    "slug": "quotadeck",
-    "version": "0.2.1",
+    "name": "Yudu",
+    "slug": "yudu",
+    "version": "0.2.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "app.quotadeck.mobile",
-      "buildNumber": "3",
+      "buildNumber": "4",
       "infoPlist": {
         "CFBundleDisplayName": "余度",
+        "CADisableMinimumFrameDurationOnPhone": true,
         "ITSAppUsesNonExemptEncryption": false,
         "NSLocalNetworkUsageDescription": "连接你在局域网内添加的额度查询站点。",
         "NSAppTransportSecurity": {

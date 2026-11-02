@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
 import release_channel  # noqa: E402
 
-REPO = 'Suxifang/QuotaDeck'
+REPO = 'Suxifang/Yudu'
 SHA = 'a' * 40
 RUN_ID = 123
 PAYLOAD = b'PK\x03\x04test-only-unsigned-package'
@@ -92,7 +92,7 @@ class PublicationTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         (self.root / 'artifacts').mkdir()
         (self.root / '.cache').mkdir()
-        (self.root / 'artifacts/QuotaDeck-unsigned.ipa').write_bytes(PAYLOAD)
+        (self.root / 'artifacts/Yudu-unsigned.ipa').write_bytes(PAYLOAD)
         self.download_record = self.root / '.cache/ipa-download.json'
         self.download_record.write_text(json.dumps({'runId': RUN_ID, 'headSha': SHA, 'sha256': DIGEST}), encoding='utf-8')
         self.github = GitHub()
@@ -159,7 +159,7 @@ class PublicationTests(unittest.TestCase):
 
     def test_setup_does_not_make_a_private_repo_public_or_create_another_repo(self):
         self.github.private = True
-        with self.assertRaisesRegex(RuntimeError, 'public QuotaDeck'):
+        with self.assertRaisesRegex(RuntimeError, 'public Yudu'):
             release_channel.setup(self.github, 'Suxifang', self.root)
         self.assertEqual(len(self.github.calls), 1)
         self.assertEqual(self.github.calls[0][0], f'/repos/{REPO}')

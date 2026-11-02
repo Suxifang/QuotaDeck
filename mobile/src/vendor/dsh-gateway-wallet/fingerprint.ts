@@ -1,6 +1,6 @@
 /**
  * Adapted from MuAllen/dsh-gateway-wallet (MIT); see licenses/dsh-gateway-wallet.txt.
- * QuotaDeck exports the scorer for its bounded, validated public probes.
+ * Yudu exports the scorer for its bounded, validated public probes.
  * 用不带密钥的探测区分中转站程序。
  * 某条路存在会回 401/200，不存在回 404；绝不根据猜测去换算额度。
  */

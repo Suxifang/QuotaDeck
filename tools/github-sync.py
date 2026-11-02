@@ -2,7 +2,7 @@
 
 Usage: python tools/github-sync.py create|push|runs|jobs RUN_ID|download RUN_ID
        python tools/github-sync.py release-setup|release-info|publish-release RUN_ID
-The user has authorized syncing QuotaDeck to their GitHub account.
+The user has authorized syncing Yudu to their GitHub account.
 """
 import base64
 import hashlib
@@ -42,7 +42,7 @@ def api(path, body=None, raw=False, method=None):
     url = path if path.startswith('https://') else 'https://api.github.com' + path
     req = urllib.request.Request(url, data=None if body is None else json.dumps(body).encode(), headers={
         'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json',
-        'User-Agent': 'QuotaDeck-project-sync', 'X-GitHub-Api-Version': '2022-11-28',
+        'User-Agent': 'Yudu-project-sync', 'X-GitHub-Api-Version': '2022-11-28',
     }, method=method or ('GET' if body is None else 'POST'))
     with opener.open(req, timeout=45) as response:
         data = response.read()
@@ -51,7 +51,7 @@ def api(path, body=None, raw=False, method=None):
 try:
     profile = api('/user')
     owner = profile['login']
-    repo = owner + '/QuotaDeck'
+    repo = owner + '/Yudu'
     action = sys.argv[1]
     if action == 'create':
         try:
@@ -59,7 +59,7 @@ try:
             print(json.dumps({'existing': True, 'repository': data['full_name'], 'private': data['private']}))
         except urllib.error.HTTPError as error:
             if error.code != 404: raise
-            data = api('/user/repos', {'name': 'QuotaDeck', 'private': False, 'description': '余度 · Yudu — open-source iOS quota dashboard for Sub2API relays and other API providers', 'auto_init': False})
+            data = api('/user/repos', {'name': 'Yudu', 'private': False, 'description': '余度 · Yudu — open-source iOS quota dashboard for Sub2API relays and other API providers', 'auto_init': False})
             print(json.dumps({'created': True, 'repository': data['full_name'], 'private': data['private']}))
     elif action == 'release-setup':
         from release_channel import setup
@@ -98,7 +98,7 @@ try:
         except urllib.error.HTTPError as error:
             if error.code not in (404, 409): raise
             if parents: raise SystemExit('Remote branch missing; inspect before synchronizing.')
-            seed_data = api('/repos/' + repo + '/contents/.gitattributes', {'message': 'Initialize QuotaDeck repository', 'content': base64.b64encode((ROOT / '.gitattributes').read_bytes()).decode()}, method='PUT')
+            seed_data = api('/repos/' + repo + '/contents/.gitattributes', {'message': 'Initialize Yudu repository', 'content': base64.b64encode((ROOT / '.gitattributes').read_bytes()).decode()}, method='PUT')
             seed = seed_data['commit']['sha']
             (ROOT / '.cache').mkdir(exist_ok=True)
             (ROOT / '.cache' / 'api-seed.json').write_text(json.dumps({'sha': seed}), encoding='utf-8')
@@ -138,21 +138,21 @@ try:
     elif action == 'download':
         data = api('/repos/' + repo + '/actions/runs/' + sys.argv[2] + '/artifacts')
         for artifact in data['artifacts']:
-            if artifact['name'] != 'QuotaDeck-unsigned-IPA': continue
+            if artifact['name'] != 'Yudu-unsigned-IPA': continue
             # GitHub redirects to a temporary blob URL. Do not forward the token.
             class NoRedirect(urllib.request.HTTPRedirectHandler):
                 def redirect_request(self, req, fp, code, msg, headers, newurl): return None
             direct = urllib.request.build_opener(urllib.request.ProxyHandler({'https': proxy}) if proxy else urllib.request.ProxyHandler(), NoRedirect())
-            req = urllib.request.Request(artifact['archive_download_url'], headers={'Authorization': 'Bearer ' + token, 'User-Agent': 'QuotaDeck-project-sync'})
+            req = urllib.request.Request(artifact['archive_download_url'], headers={'Authorization': 'Bearer ' + token, 'User-Agent': 'Yudu-project-sync'})
             try:
                 response = direct.open(req, timeout=45); archive = response.read()
             except urllib.error.HTTPError as error:
                 if error.code not in (301, 302, 303, 307, 308): raise
-                with opener.open(urllib.request.Request(error.headers['Location'], headers={'User-Agent': 'QuotaDeck-project-sync'}), timeout=90) as response: archive = response.read()
+                with opener.open(urllib.request.Request(error.headers['Location'], headers={'User-Agent': 'Yudu-project-sync'}), timeout=90) as response: archive = response.read()
             with zipfile.ZipFile(io.BytesIO(archive)) as package:
                 for name in package.namelist():
-                    if Path(name).name == 'QuotaDeck-unsigned.ipa':
-                        target = ROOT / 'artifacts' / 'QuotaDeck-unsigned.ipa'
+                    if Path(name).name == 'Yudu-unsigned.ipa':
+                        target = ROOT / 'artifacts' / 'Yudu-unsigned.ipa'
                         target.parent.mkdir(exist_ok=True)
                         payload = package.read(name)
                         target.write_bytes(payload)

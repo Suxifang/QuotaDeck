@@ -29,6 +29,16 @@ export function useGlassPreferences() {
   return { reduce, liquid };
 }
 
+export function useReduceMotion() {
+  const [reduceMotion, setReduceMotion] = useState(false);
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion).catch(() => {});
+    const listener = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotion);
+    return () => listener.remove();
+  }, []);
+  return reduceMotion;
+}
+
 export function Glass({ children, style, subtle = false }: React.PropsWithChildren<{ style?: StyleProp<ViewStyle>; subtle?: boolean }>) {
   const t = useTheme();
   const { reduce, liquid } = useGlassPreferences();

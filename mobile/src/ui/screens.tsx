@@ -1,20 +1,19 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ArrowRight, ChevronRight, FlaskConical, Link2, Plus, RefreshCw, ShieldCheck } from 'lucide-react-native';
+import { ArrowDownToLine, ArrowRight, ChevronRight, FlaskConical, Link2, Plus, RefreshCw, ShieldCheck } from 'lucide-react-native';
 import { PROVIDER_LABELS, type Source } from '../domain/types';
 import { attention, hostLabel, isSampleStale } from '../domain/format';
 import type { QuotaController } from '../state/useQuota';
-import { Button, Glass, IconButton, Logo, styles, tap } from './primitives';
+import { Button, Glass, IconButton, Logo, Sheet, styles, tap } from './primitives';
 import { SourceCard, ProviderMark } from './source-card';
 import { ConnectionSheet } from './connection-sheet';
 import { DetailSheet } from './detail-sheet';
 import { Settings } from './settings';
 import { useTheme } from './theme';
-import { Ambient } from './ambient';
 import { useUpdates } from '../updates/context';
+import { UpdateSettings } from './update-settings';
 
 type Tab = 'overview' | 'connections' | 'settings';
 
@@ -27,6 +26,7 @@ export function Deck({ controller, tab }: { controller: QuotaController; tab: Ta
   const [detailId, setDetailId] = useState<string>();
   const [filter, setFilter] = useState<'all' | 'pinned'>('all');
   const [refreshing, setRefreshing] = useState(false);
+  const [showUpdates, setShowUpdates] = useState(false);
   const data = controller.data;
   const closeDetail = () => { setDetailId(undefined); if (sourceId) router.setParams({ sourceId: undefined }); };
   const sources = [...data.sources].sort((a, b) => Number(b.pinned) - Number(a.pinned));
@@ -37,14 +37,14 @@ export function Deck({ controller, tab }: { controller: QuotaController; tab: Ta
   const refresh = async () => { setRefreshing(true); try { await controller.refreshAll(); } finally { setRefreshing(false); } };
   const bottom = Math.max(insets.bottom, Platform.OS === 'web' ? 20 : 10);
 
-  return <LinearGradient colors={t.backdrop} style={{ flex: 1 }}>
-    <Ambient />
+  return <View style={{ flex: 1 }}>
     <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled"
       refreshControl={tab !== 'settings' ? <RefreshControl refreshing={refreshing} onRefresh={() => void refresh()} tintColor={t.accent} colors={[t.accent]} /> : undefined}
       contentContainerStyle={{ paddingTop: insets.top + 20, paddingBottom: 112 + bottom, paddingHorizontal: 22, width: '100%', maxWidth: 560, alignSelf: 'center', gap: 20 }}>
       <View style={styles.between}>
         <View style={[styles.row, { gap: 10 }]}><Logo size={33} /><Text style={{ fontSize: 19, fontWeight: '700', color: t.ink, letterSpacing: .5 }}>余度</Text><Text style={{ fontSize: 10, color: t.secondary, letterSpacing: 1.6, marginTop: 4 }}>YUDU</Text></View>
         <View style={[styles.row, { gap: 8 }]}>
+          <IconButton icon={ArrowDownToLine} label="软件更新" onPress={() => setShowUpdates(true)} active={!!updates.release} size={37} />
           <IconButton icon={RefreshCw} label="刷新全部额度" onPress={() => void refresh()} disabled={refreshing || !sources.length} size={37} />
           <IconButton icon={Plus} label="添加连接" onPress={add} active size={37} />
         </View>
@@ -53,7 +53,7 @@ export function Deck({ controller, tab }: { controller: QuotaController; tab: Ta
         <View style={[styles.row, { gap: 7 }]}><FlaskConical size={14} color={t.amber} /><Text style={{ color: t.secondary, fontSize: 11 }}>演示模式 · 以下均为示例数据</Text></View>
         <Pressable accessibilityRole="button" accessibilityLabel="退出演示" onPress={() => { controller.exitDemo(); setDetailId(undefined); }}><Text style={{ color: t.accent, fontSize: 11, fontWeight: '600' }}>退出</Text></Pressable>
       </View></Glass> : null}
-      {tab !== 'settings' && updates.autoCheck && updates.release ? <Glass subtle style={{ paddingHorizontal: 15, borderRadius: 17 }}><Pressable accessibilityRole="button" accessibilityLabel="查看新版本" onPress={() => router.push('/settings')} style={[styles.between, { minHeight: 48, gap: 10 }]}><Text style={{ color: t.accent, fontSize: 12 }}>余度 {updates.release.version} 已发布</Text><View style={[styles.row, { gap: 5 }]}><Text style={{ color: t.secondary, fontSize: 11 }}>查看更新</Text><ChevronRight size={14} color={t.secondary} /></View></Pressable></Glass> : null}
+      {tab !== 'settings' && updates.release ? <Glass subtle style={{ paddingHorizontal: 15, borderRadius: 17 }}><Pressable accessibilityRole="button" accessibilityLabel="查看新版本" onPress={() => setShowUpdates(true)} style={[styles.between, { minHeight: 48, gap: 10 }]}><Text style={{ color: t.accent, fontSize: 12 }}>余度 {updates.release.version} 已发布</Text><View style={[styles.row, { gap: 5 }]}><Text style={{ color: t.secondary, fontSize: 11 }}>查看更新</Text><ChevronRight size={14} color={t.secondary} /></View></Pressable></Glass> : null}
       {controller.storageError ? <Text accessibilityRole="alert" style={{ color: t.red, fontSize: 12, lineHeight: 20 }}>{controller.storageError}</Text> : null}
       {!controller.ready ? <ActivityIndicator color={t.accent} style={{ marginTop: 100 }} /> : tab === 'overview' ? <>
         <View style={{ gap: 8 }}>
@@ -92,9 +92,10 @@ export function Deck({ controller, tab }: { controller: QuotaController; tab: Ta
         <Glass subtle style={{ padding: 20, gap: 10 }}><View style={[styles.row, { gap: 8 }]}><Link2 size={17} color={t.accent} /><Text style={{ color: t.ink, fontSize: 13, fontWeight: '600' }}>为不同接口，留好位置</Text></View><Text style={{ color: t.secondary, fontSize: 11, lineHeight: 21 }}>Sub2API 套餐与反代、New API、One API、OpenRouter、DeepSeek，以及自定义余额接口。</Text></Glass>
       </> : <Settings controller={controller} />}
     </ScrollView>
+    {showUpdates ? <Sheet visible title="软件更新" onClose={() => setShowUpdates(false)}><UpdateSettings /></Sheet> : null}
     {connection ? <ConnectionSheet controller={controller} existing={connection.existing} onClose={() => setConnection(undefined)} /> : null}
     {detail && !connection ? <DetailSheet source={detail} controller={controller} onClose={closeDetail} onReconnect={source => { closeDetail(); setConnection({ existing: source }); }} /> : null}
-  </LinearGradient>;
+  </View>;
 }
 
 export function PageTitle({ title, subtitle, eyebrow }: { title: string; subtitle: string; eyebrow: string }) {

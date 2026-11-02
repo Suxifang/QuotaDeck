@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Platform, Pressable, Text, View } from 'react-native';
-import { ArrowUpRight, Check, ChevronDown, LayoutGrid, Smartphone } from 'lucide-react-native';
+import { ArrowUpRight, Check, ChevronDown, LayoutGrid, RefreshCw, Smartphone } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { QuotaController } from '../state/useQuota';
 import { focusAccount, widgetData } from '../widgets/model';
-import { Glass, styles } from './primitives';
+import { Button, Glass, styles } from './primitives';
 import { radius, useTheme } from './theme';
 
 export function WidgetSettings({ controller }: { controller: QuotaController }) {
@@ -15,9 +15,20 @@ export function WidgetSettings({ controller }: { controller: QuotaController }) 
   const metric = focus?.metrics[0];
   const tint = metric?.percent != null && metric.percent <= preview.threshold ? t.amber : t.accent;
   const backgrounds = t.dark ? ['#34484D', '#293B29'] as const : ['#DAE9E4', '#C8D2B3'] as const;
+  const realAccounts = controller.saved.sources.filter(source => source.enabled).length;
+  const sync = controller.widgetSyncResult;
   return <>
     <View style={{ gap: 9 }}><Text style={{ fontSize: 24, fontWeight: '600', letterSpacing: -.8, color: t.ink }}>抬眼，心中有数。</Text>
       <Text style={{ color: t.secondary, fontSize: 12, lineHeight: 21 }}>把常用账号放在桌面，也可以留在锁屏。{controller.isDemo ? '下方为演示预览。' : ''}</Text></View>
+    <Glass subtle style={{ padding: 18, gap: 13 }}>
+      <View style={styles.between}><Text style={{ color: t.ink, fontSize: 14, fontWeight: '600' }}>让桌面显示额度</Text><Text style={{ color: t.secondary, fontSize: 11 }}>可同步账号 · {realAccounts}</Text></View>
+      <Text style={{ color: t.secondary, fontSize: 12, lineHeight: 21 }}>{!realAccounts ? '先在“连接”中添加真实站点并启用账号，再返回这里同步。演示账号只供应用内预览，桌面会保持空白。' : '账号已就绪。同步后，小组件会显示最近一次查询的余量；置顶账号会优先显示。'}</Text>
+      {Platform.OS === 'ios' ? <>
+        <Button title={controller.widgetSyncing ? '正在同步…' : '立即同步到小组件'} icon={RefreshCw} loading={controller.widgetSyncing} disabled={!controller.ready} onPress={() => void controller.publishWidgets(true)} />
+        {controller.widgetError ? <Text accessibilityRole="alert" style={{ color: t.amber, fontSize: 12, lineHeight: 21 }}>{controller.widgetError}</Text> : sync?.supported ? <Text accessibilityLiveRegion="polite" style={{ color: t.secondary, fontSize: 11, lineHeight: 20 }}>已写入 {sync.accountCount} 个账号 · {new Date(sync.syncedAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}。桌面显示由系统刷新，可能稍有延迟。</Text> : null}
+        <Text style={{ color: t.muted, fontSize: 11, lineHeight: 20 }}>如果仍显示“常用账号 · 0”，先打开应用完成查询并同步，再移除桌面旧卡片后重新添加；若仍无数据，需检查自签时主应用与小组件的共享权限是否一致。</Text>
+      </> : <Text style={{ color: t.muted, fontSize: 11 }}>桌面同步需要在已安装的 iPhone 应用内操作。</Text>}
+    </Glass>
     <View style={{ alignItems: 'center', paddingVertical: 8, gap: 12 }}>
       <LinearGradient colors={backgrounds} style={{ width: 164, height: 164, padding: 17, borderRadius: 24, borderCurve: 'continuous', borderWidth: 1, borderColor: t.border, boxShadow: '0px 12px 30px rgba(23,60,100,.10)' }}>
         <View style={styles.between}><Text numberOfLines={1} style={{ color: t.ink, fontSize: 11, fontWeight: '600', flex: 1 }}>{focus?.name ?? '余度'}</Text><ArrowUpRight size={12} color={t.muted} /></View>
@@ -59,6 +70,5 @@ export function WidgetSettings({ controller }: { controller: QuotaController }) 
     </View>
     <Text style={{ color: t.muted, fontSize: 11, lineHeight: 20 }}>应用每次查询后会同步最新结果。小组件保留最近一次额度，超过 15 分钟或已过重置时间会标记待更新；点击可回到对应账号详情。当前版本不会在应用关闭后主动向站点查询。</Text>
     {Platform.OS === 'web' ? <Text style={{ color: t.secondary, fontSize: 11, lineHeight: 19 }}>这里是外观预览，小组件需安装 iOS 版本后使用。</Text> : null}
-    {controller.widgetError ? <Text accessibilityRole="alert" style={{ color: t.amber, fontSize: 12 }}>{controller.widgetError}</Text> : null}
   </>;
 }

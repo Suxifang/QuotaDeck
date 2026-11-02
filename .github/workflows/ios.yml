@@ -34,7 +34,7 @@ jobs:
       - run: npm run build:web
       - uses: actions/upload-artifact@v4
         with:
-          name: QuotaDeck-web-preview
+          name: Yudu-web-preview
           path: mobile/dist
           retention-days: 14
   ios:
@@ -62,7 +62,7 @@ jobs:
         run: python3 tools/validate-ipa.py
       - uses: actions/upload-artifact@v4
         with:
-          name: QuotaDeck-unsigned-IPA
-          path: artifacts/QuotaDeck-unsigned.ipa
+          name: Yudu-unsigned-IPA
+          path: artifacts/Yudu-unsigned.ipa
           if-no-files-found: error
           retention-days: 30

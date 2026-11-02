@@ -15,12 +15,14 @@ function github() {
 
 describe('official update metadata and version ordering', () => {
   it('uses the source repository and rejects packages or cached metadata from the retired channel', () => {
-    expect(RELEASE_REPOSITORY).toBe('Suxifang/QuotaDeck');
-    const oldUrl = 'https://github.com/Suxifang/Yudu-Releases/releases';
-    const retired = { ...github(), html_url: `${oldUrl}/tag/v0.3.0`, assets: [{ ...github().assets[0], browser_download_url: `${oldUrl}/download/v0.3.0/Yudu-0.3.0.ipa` }] };
-    expect(() => parseGitHubRelease(retired)).toThrow();
-    const cached = parseGitHubRelease(github());
-    expect(() => validateRelease({ ...cached, pageUrl: retired.html_url, downloadUrl: retired.assets[0].browser_download_url })).toThrow();
+    expect(RELEASE_REPOSITORY).toBe('Suxifang/Yudu');
+    for (const oldRepo of ['QuotaDeck', 'Yudu-Releases']) {
+      const oldUrl = `https://github.com/Suxifang/${oldRepo}/releases`;
+      const retired = { ...github(), html_url: `${oldUrl}/tag/v0.3.0`, assets: [{ ...github().assets[0], browser_download_url: `${oldUrl}/download/v0.3.0/Yudu-0.3.0.ipa` }] };
+      expect(() => parseGitHubRelease(retired)).toThrow();
+      const cached = parseGitHubRelease(github());
+      expect(() => validateRelease({ ...cached, pageUrl: retired.html_url, downloadUrl: retired.assets[0].browser_download_url })).toThrow();
+    }
   });
   it('compares numbers instead of lexicographic strings and refuses prerelease or malformed versions', () => {
     expect(compareVersions('0.10.0', '0.2.0')).toBe(1);

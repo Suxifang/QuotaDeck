@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { Credential, Source } from '../src/domain/types';
 import { fetchUsage, parseUserUsage } from '../src/providers/usage';
-import { loginUsageUser, matchUserKey, refreshUsageUser } from '../src/providers/user-session';
+import { loginUsageUser, matchUserKey, refreshUsageUser, usageLoginNeedsVerification } from '../src/providers/user-session';
 import { createRequester, QuotaError, type Requester } from '../src/providers/transport';
 import { createUsageReader } from '../src/state/usage-reader';
 
@@ -15,6 +15,36 @@ const row = { id: 9, user_id: 10, api_key_id: 23, model: 'm', actual_cost: 0, in
 const usageList = (items = [row]) => ({ data: { items, page: 1, page_size: 20, pages: 1 } });
 
 describe('Sub2API package site login', () => {
+  it('recognizes site verification requirements using a public request without credentials', async () => {
+    const ask = vi.fn<Requester>(async () => ({ code: 0, data: { turnstile_enabled: true } }));
+    expect(await usageLoginNeedsVerification(source, ask)).toBe(true);
+    expect(ask.mock.calls[0].slice(1)).toEqual(['/api/v1/settings/public', undefined, { auth: 'none' }]);
+    for (const flag of ['tencent_captcha_enabled', 'aliyun_captcha_enabled', 'login_agreement_enabled']) {
+      expect(await usageLoginNeedsVerification(source, async () => ({ data: { [flag]: true } }))).toBe(true);
+    }
+    expect(await usageLoginNeedsVerification(source, async () => ({ data: { turnstile_enabled: false } }))).toBe(false);
+  });
+  it('validates a completed website session with the server before associating its exact API key', async () => {
+    const ask = vi.fn<Requester>(async (_source, path) => path.endsWith('/auth/me') ? { data: { id: 10 } } : keyList);
+    const result = await loginUsageUser(source, secret, { siteSession: { accessToken: session.accessToken!, refreshToken: session.refreshToken, expiresAt: Date.now() + 3600_000 } }, ask);
+    expect(result).toMatchObject({ credential: { userId: 10, apiKeyId: 23, accessToken: session.accessToken } });
+    expect(ask.mock.calls.map(call => call[1])).toEqual(['/api/v1/auth/me', '/api/v1/keys?page=1&page_size=100']);
+    expect(ask.mock.calls.every(call => !call[1].includes(secret))).toBe(true);
+    const rejected = vi.fn<Requester>(async () => { throw new QuotaError('AUTH', '登录失效', 401); });
+    await expect(loginUsageUser(source, secret, { siteSession: { accessToken: 'expired-token' } }, rejected)).rejects.toMatchObject({ code: 'AUTH' });
+    expect(rejected).toHaveBeenCalledTimes(1);
+    await expect(loginUsageUser(source, secret, { siteSession: { accessToken: 'test-token' } }, async () => ({ data: { role: 'user' } }))).rejects.toThrow('用户信息');
+  });
+  it('distinguishes captcha rejection from wrong credentials without echoing server payloads', async () => {
+    for (const [reason, expected] of [['TURNSTILE_TOKEN_REQUIRED', '人机验证'], ['INVALID_CREDENTIALS', '邮箱或密码'], ['', '站点未接受登录请求']]) {
+      const fetcher = vi.fn<typeof fetch>(async () => new Response(JSON.stringify({ reason, message: 'unsafe echo: test-password' }), { status: 403 }));
+      const error = await loginUsageUser(source, secret, { email: 'e', password: 'p' }, createRequester(fetcher as typeof fetch)).catch(error => error as Error);
+      expect(error).toBeInstanceOf(QuotaError);
+      expect((error as Error).message).toContain(expected);
+      expect((error as Error).message).not.toContain('unsafe echo');
+      expect((error as Error).cause).toBeInstanceOf(QuotaError);
+    }
+  });
   it('accepts an ordinary user and associates only the exact full API key', async () => {
     const ask = vi.fn<Requester>(async (_source, path) => path.endsWith('/login') ? loginResponse : keyList);
     const result = await loginUsageUser(source, secret, { email: ' test@example.invalid ', password: 'test-password' }, ask);

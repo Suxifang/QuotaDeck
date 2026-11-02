@@ -21,6 +21,27 @@ describe('widget snapshots and future timelines', () => {
     expect(props.accounts[0].status).toBe('连接待检查');
     expect(JSON.stringify(props)).not.toMatch(/private\.example|secret-session|secret-token|baseUrl|connectionId/);
   });
+  it('labels the phone query time and retains it when the last observation becomes stale', () => {
+    const saved = data();
+    saved.states[source.id].snapshot!.metrics[0].sampledAt = new Date(now - 10 * 60_000).toISOString();
+    const fresh = widgetData(saved, now).accounts[0];
+    expect(fresh.queryLabel).toBe(`查询 ${fresh.updatedLabel}`);
+    const stale = widgetData(saved, now + 15 * 60_000).accounts[0];
+    expect(stale.queryLabel).toBe(`待更新 ${fresh.updatedLabel}`);
+    saved.states[source.id].error = 'Request failed';
+    expect(widgetData(saved, now).accounts[0].queryLabel).toBe(`查询失败 ${fresh.updatedLabel}`);
+  });
+  it('does not present an invalid, future, or missing query time as a successful update', () => {
+    const saved = data();
+    for (const fetchedAt of ['invalid', new Date(now + 6 * 60_000).toISOString()]) {
+      saved.states[source.id].snapshot!.fetchedAt = fetchedAt;
+      const account = widgetData(saved, now).accounts[0];
+      expect(account.queryLabel).toBe('查询时间未知');
+      expect(account.metrics[0].stale).toBe(true);
+    }
+    delete saved.states[source.id].snapshot;
+    expect(widgetData(saved, now).accounts[0].queryLabel).toBe('打开应用查询');
+  });
   it('prioritizes pinned accounts, omits paused accounts, and honors the focus choice', () => {
     const saved = data();
     saved.sources.push({ ...source, id: 'paused', enabled: false, pinned: true }, { ...source, id: 'pinned', pinned: true });

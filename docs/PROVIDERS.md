@@ -32,7 +32,8 @@
 
 - Sub2API 反代：`GET /api/v1/admin/usage?account_id=ID&page=N&page_size=20&sort_by=created_at&sort_order=desc`，沿用管理密钥或管理员会话。逐行校验返回的 `account_id`；任何一条账号不符或缺失都拒绝显示，不回退到全站记录。按后台分页，未把列表的局部费用合计为今日总额。
 - New API：`GET /api/log/token`，API Key 只在 Bearer 请求头中发送，绝不放进 URL。接口返回当前密钥的有限近期记录，本地每页显示 20 条，不假装支持完整历史分页。只展示消费和失败请求，排除充值、退款、管理等事件。老分支或站点若不支持 Bearer 查询则报告不兼容。
-- Sub2API 套餐：详情内用站点邮箱和密码登录，支持 TOTP 两步验证码。通过 `GET /api/v1/keys?page=N&page_size=100` 在手机内匹配完整 API Key（最多检查 1000 条），再用用户 JWT 请求 `GET /api/v1/usage?api_key_id=ID&page=N&page_size=20&sort_by=created_at&sort_order=desc`。逐行验证 `user_id` 与 `api_key_id`，不回退到账号全部记录。密钥不进入查询参数；密码不落盘，用户 JWT 单独存入钥匙串，原额度 Key 不变。站点隐藏完整密钥、没有兼容用户接口、只允许第三方登录或要求网页人机验证时明确提示，当前不支持直接登录这些情况。其他接入方式尚未接入逐次日志。
+- Sub2API 套餐：详情内用站点邮箱和密码登录，支持 TOTP 两步验证码。通过 `GET /api/v1/keys?page=N&page_size=100` 在手机内匹配完整 API Key（最多检查 1000 条），再用用户 JWT 请求 `GET /api/v1/usage?api_key_id=ID&page=N&page_size=20&sort_by=created_at&sort_order=desc`。逐行验证 `user_id` 与 `api_key_id`，不回退到账号全部记录。密钥不进入查询参数；密码不落盘，用户 JWT 单独存入钥匙串，原额度 Key 不变。站点隐藏完整密钥、没有兼容用户接口或只允许第三方登录时明确提示。其他接入方式尚未接入逐次日志。
+- 验证登录：从公共设置检查 Turnstile、腾讯／阿里验证码及登录协议要求，需要时在原生应用内打开本站登录页；原密码表单也提供该入口。独立临时网页会话完成站点验证后，只读取 Sub2API 官方前端的 `auth_token`、`refresh_token`、`token_expires_at`，不读取密码或网页身份。主页面和交接消息限于配置站点的确切来源及路径前缀，第三方验证子框架不获得交接权限；关闭时释放临时网页。应用先用 `GET /api/v1/auth/me` 核验用户，再匹配完整密钥，成功后保存既有的独立使用记录登录态。网站分支若更改存储键、登录路径或接口，仍需适配；不会为登录失败绕过验证码。
 - Sub2API 优先显示 `actual_cost`，只有 `total_cost` 时标记“标准价”。New API 沿用站点公开货币换算规则。缺失数值显示 `—`，真实 0 保留，费用最多六位小数；正数低于最小显示精度时显示 `<$0.000001`。
 - `first_token_ms` / New API `other.frt` 为毫秒，Sub2API `duration_ms` 为毫秒，New API `use_time` 为秒。缺失时不推测吞吐率或延迟。
 - 记录按需读取，支持手动刷新；管理员会话续期与额度查询共用，套餐的用户会话单独续期并保留密钥筛选范围。重连或删除连接后拒绝旧请求的结果，并清理记录登录态。只保留模型、时间、扣费和用量字段，详情关闭即释放，不写入本机额度缓存、小组件或配置导出。

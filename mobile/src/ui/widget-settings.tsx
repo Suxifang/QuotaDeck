@@ -14,7 +14,7 @@ export function WidgetSettings({ controller }: { controller: QuotaController }) 
   const preview = widgetData(controller.data);
   const focus = focusAccount(preview);
   const metric = focus?.metrics[0];
-  const tint = metric?.percent != null && metric.percent <= preview.threshold ? t.amber : t.accent;
+  const tint = metric?.stale ? t.secondary : metric?.percent != null && metric.percent <= preview.threshold ? t.amber : t.accent;
   const backgrounds = t.dark ? ['#34484D', '#293B29'] as const : ['#DAE9E4', '#C8D2B3'] as const;
   const realAccounts = controller.saved.sources.filter(source => source.enabled).length;
   const sync = controller.widgetSyncResult;
@@ -42,26 +42,37 @@ export function WidgetSettings({ controller }: { controller: QuotaController }) 
     {showPreview ? <>
     <Text style={{ color: t.muted, fontSize: 10 }}>下方仅为应用内预览，不代表桌面已经同步。</Text>
     <View style={{ alignItems: 'center', paddingVertical: 8, gap: 12 }}>
-      <LinearGradient colors={backgrounds} style={{ width: 164, height: 164, padding: 17, borderRadius: 24, borderCurve: 'continuous', borderWidth: 1, borderColor: t.border, boxShadow: '0px 12px 30px rgba(23,60,100,.10)' }}>
+      <LinearGradient colors={backgrounds} style={{ width: 164, height: 164, padding: 16, borderRadius: 24, borderCurve: 'continuous', borderWidth: 1, borderColor: t.border, boxShadow: '0px 12px 30px rgba(23,60,100,.10)' }}>
         <View style={styles.between}><Text numberOfLines={1} style={{ color: t.ink, fontSize: 11, fontWeight: '600', flex: 1 }}>{focus?.name ?? '余度'}</Text><ArrowUpRight size={12} color={t.muted} /></View>
-        <View style={{ flex: 1, justifyContent: 'center', gap: 6 }}>
-          <Text numberOfLines={1} style={{ color: t.secondary, fontSize: 9 }}>{metric ? `${metric.label} · 剩余` : '额度，抬眼就看见。'}</Text>
-          <Text numberOfLines={1} adjustsFontSizeToFit style={{ color: t.ink, fontSize: 31, letterSpacing: -1.2, fontWeight: '600', fontVariant: ['tabular-nums'] }}>{metric?.value ?? '—'}</Text>
-          {metric?.percent != null ? <View style={{ height: 4, borderRadius: 2, backgroundColor: t.line }}><View style={{ height: 4, width: `${metric.percent}%`, backgroundColor: tint, borderRadius: 2 }} /></View> : null}
+        <View style={{ flex: 1, justifyContent: 'center', gap: 4 }}>
+          <Text numberOfLines={1} style={{ color: t.secondary, fontSize: 9 }}>{metric ? `${metric.label}${metric.stale ? ' · 上次余量' : ''}` : '额度，抬眼就看见。'}</Text>
+          <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={.65} style={{ color: metric?.stale ? t.secondary : t.ink, fontSize: 30, height: 35, lineHeight: 35, fontWeight: '600', fontVariant: ['tabular-nums'] }}>{metric?.value ?? '—'}</Text>
+          {metric?.percent != null ? <View style={[styles.row, { gap: 5, height: 10 }]}><View style={{ flex: 1, height: 4, borderRadius: 2, backgroundColor: t.line }}><View style={{ height: 4, width: `${metric.percent}%`, backgroundColor: tint, borderRadius: 2 }} /></View><Text style={{ color: tint, fontSize: 8, fontVariant: ['tabular-nums'] }}>{Math.round(metric.percent)}%</Text></View> : null}
           {focus?.metrics[1] ? <View style={styles.between}><Text style={{ color: t.secondary, fontSize: 9 }}>{focus.metrics[1].label}</Text><Text style={{ color: t.ink, fontSize: 10, fontWeight: '500' }}>{focus.metrics[1].value}</Text></View> : null}
+          {!focus?.metrics[1] && metric?.resetText ? <Text numberOfLines={1} style={{ color: t.secondary, fontSize: 8 }}>{metric.resetText}</Text> : null}
         </View>
-        <Text numberOfLines={1} style={{ color: t.muted, fontSize: 8 }}>{focus ? `${focus.status} · ${focus.updatedLabel}` : '打开余度，连接第一个站点'}</Text>
+        <Text numberOfLines={1} style={{ color: t.secondary, fontSize: 8, fontVariant: ['tabular-nums'] }}>{focus?.queryLabel ?? '打开余度，连接第一个站点'}</Text>
       </LinearGradient>
       <Text style={{ color: t.muted, fontSize: 10 }}>关注账号 · 小号</Text>
     </View>
-    <LinearGradient colors={backgrounds} style={{ padding: 18, gap: 20, borderRadius: radius.card, borderCurve: 'continuous', borderWidth: 1, borderColor: t.border }}>
-      <View style={styles.between}><Text style={{ color: t.ink, fontSize: 12, fontWeight: '600' }}>余度</Text><Text style={{ color: t.secondary, fontSize: 9 }}>常用账号 · {preview.accounts.length}</Text></View>
-      <View style={{ flexDirection: 'row', gap: 16 }}>{preview.accounts.length ? preview.accounts.slice(0, 3).map(account => <View key={account.id} style={{ flex: 1, gap: 7 }}>
-        <Text numberOfLines={1} style={{ color: t.ink, fontWeight: '500', fontSize: 10 }}>{account.name}</Text><Text numberOfLines={1} style={{ color: t.secondary, fontSize: 8 }}>{account.metrics[0]?.label ?? account.provider}</Text>
-        <Text numberOfLines={1} adjustsFontSizeToFit style={{ color: t.ink, fontSize: 22, fontWeight: '600', letterSpacing: -.8 }}>{account.metrics[0]?.value ?? '—'}</Text>
-        {account.metrics[0]?.percent != null ? <View style={{ height: 4, backgroundColor: t.line, borderRadius: 2 }}><View style={{ height: 4, borderRadius: 2, width: `${account.metrics[0].percent}%`, backgroundColor: account.metrics[0].percent <= preview.threshold ? t.amber : t.accent }} /></View> : null}
-      </View>) : <Text style={{ color: t.secondary, fontSize: 12 }}>连接站点后，这里会显示常用账号。</Text>}</View>
-      <Text style={{ color: t.muted, fontSize: 8 }}>最近一次查询 · 打开应用同步最新额度</Text>
+    <LinearGradient colors={backgrounds} style={{ width: '100%', maxWidth: 360, height: 164, alignSelf: 'center', padding: 16, borderRadius: radius.card, borderCurve: 'continuous', borderWidth: 1, borderColor: t.border }}>
+      <View style={styles.between}><Text style={{ color: t.ink, fontSize: 12, fontWeight: '600' }}>余度</Text><Text style={{ color: t.secondary, fontSize: 9 }}>{preview.accounts.length > 3 ? `常用账号 · 3 / ${preview.accounts.length}` : `常用账号 · ${preview.accounts.length}`}</Text></View>
+      <View style={{ flex: 1, justifyContent: 'center' }}><View style={{ flexDirection: 'row', gap: 14 }}>{preview.accounts.length ? preview.accounts.slice(0, 3).map(account => {
+        const primary = account.metrics[0];
+        const secondary = account.metrics[1];
+        const color = primary?.stale ? t.secondary : primary?.percent != null && primary.percent <= preview.threshold ? t.amber : t.accent;
+        const detail = secondary ? `${secondary.label} ${secondary.value}` : primary?.resetText || (primary ? account.provider : '等待首次查询');
+        return <View key={account.id} style={{ flex: 1, minWidth: 0, gap: 4 }}>
+          <Text numberOfLines={1} style={{ color: t.ink, fontWeight: '600', fontSize: 11, height: 14, lineHeight: 14 }}>{account.name}</Text>
+          <Text numberOfLines={1} style={{ color: t.secondary, fontSize: 9, height: 11, lineHeight: 11 }}>{primary?.label ?? account.provider}</Text>
+          <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={.65} style={{ color: primary?.stale ? t.secondary : t.ink, fontSize: preview.accounts.length > 2 ? 21 : 27, fontWeight: '600', height: 33, lineHeight: 33, fontVariant: ['tabular-nums'] }}>{primary?.value ?? '—'}</Text>
+          <View style={[styles.row, { height: 10, gap: 5 }]}>{primary?.percent != null ? <>
+            <View style={{ flex: 1, height: 4, backgroundColor: t.line, borderRadius: 2 }}><View style={{ height: 4, borderRadius: 2, width: `${primary.percent}%`, backgroundColor: color }} /></View>
+            <Text style={{ color, fontSize: 8, fontVariant: ['tabular-nums'] }}>{Math.round(primary.percent)}%</Text>
+          </> : <Text numberOfLines={1} style={{ color: t.secondary, fontSize: 8, flex: 1 }}>{detail}</Text>}</View>
+          <Text numberOfLines={1} style={{ color: t.secondary, fontSize: 8, height: 11, lineHeight: 11, fontVariant: ['tabular-nums'] }}>{account.queryLabel}</Text>
+        </View>;
+      }) : <View style={{ gap: 7 }}><Text style={{ color: t.ink, fontSize: 22, fontWeight: '600' }}>抬眼，心中有数。</Text><Text style={{ color: t.secondary, fontSize: 11 }}>打开余度，连接常用的 API 站点。</Text></View>}</View></View>
     </LinearGradient>
     <Text style={{ color: t.muted, fontSize: 10, textAlign: 'center', marginTop: -9 }}>常用账号 · 中号 · 置顶优先</Text>
     </> : null}

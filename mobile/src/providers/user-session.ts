@@ -1,10 +1,16 @@
 import type { Credential, Source } from '../domain/types';
 import { refreshSession, request, sessionFromResponse } from './registry';
 import { nonnegative, object, QuotaError, type Requester, string, unwrap } from './transport';
+import type { SiteSession } from './site-login';
 
-export type UsageLoginInput = { email?: string; password?: string; tempToken?: string; code?: string };
+export type UsageLoginInput = { email?: string; password?: string; tempToken?: string; code?: string; siteSession?: SiteSession };
 export type UsageLoginResult = { requiresTwoFactor: true; tempToken: string } | { credential: Credential };
 const positiveId = (value: unknown) => { const id = nonnegative(value); return id && Number.isSafeInteger(id) ? id : undefined; };
+
+export async function usageLoginNeedsVerification(source: Source, ask: Requester = request): Promise<boolean> {
+  const data = unwrap(await ask(source, '/api/v1/settings/public', undefined, { auth: 'none' }));
+  return data.turnstile_enabled === true || data.tencent_captcha_enabled === true || data.aliyun_captcha_enabled === true || data.login_agreement_enabled === true;
+}
 
 export async function refreshUsageUser(source: Source, credential: Credential, ask: Requester = request): Promise<Credential> {
   if (!credential.userId || !credential.apiKeyId) throw new QuotaError('AUTH', '请重新登录站点并关联当前密钥');
@@ -29,6 +35,17 @@ export async function matchUserKey(source: Source, apiKey: string, session: Cred
 }
 
 export async function loginUsageUser(source: Source, apiKey: string, input: UsageLoginInput, ask: Requester = request): Promise<UsageLoginResult> {
+  if (input.siteSession) {
+    const session = sessionFromResponse({ access_token: input.siteSession.accessToken, refresh_token: input.siteSession.refreshToken,
+      expires_in: input.siteSession.expiresAt === undefined ? 300 : Math.max(0, Math.floor((input.siteSession.expiresAt - Date.now()) / 1000)),
+    });
+    // Do not trust a browser-provided user ID or widen the scope to all user keys.
+    const user = unwrap(await ask(source, '/api/v1/auth/me', session));
+    const userId = positiveId(user.id);
+    if (!userId) throw new QuotaError('INVALID', '站点未返回有效的用户信息');
+    const apiKeyId = await matchUserKey(source, apiKey, session, userId, ask);
+    return { credential: { ...session, userId, apiKeyId } };
+  }
   const secondFactor = !!input.tempToken;
   if (secondFactor ? !/^\d{6}$/.test(input.code ?? '') : !input.email?.trim() || !input.password) throw new QuotaError('CONFIG', secondFactor ? '请输入六位验证码' : '请输入站点邮箱和密码');
   let data: Record<string, unknown>;
@@ -37,7 +54,15 @@ export async function loginUsageUser(source: Source, apiKey: string, input: Usag
       auth: 'none', method: 'POST', body: secondFactor ? { temp_token: input.tempToken, totp_code: input.code } : { email: input.email!.trim(), password: input.password },
     }));
   } catch (error) {
-    if (error instanceof QuotaError && [400, 401, 403].includes(error.status ?? 0)) throw new QuotaError('AUTH', secondFactor ? '验证码未通过，或本次登录已过期，请重试' : '登录未通过，请检查邮箱和密码。若站点要求网页人机验证或第三方登录，暂时无法直接登录。', error.status);
+    if (error instanceof QuotaError && [400, 401, 403].includes(error.status ?? 0)) {
+      const message = secondFactor ? '验证码未通过，或本次登录已过期，请重试'
+        : /CAPTCHA|TURNSTILE|VERIFICATION_REQUIRED/.test(error.reason ?? '') ? '本站要求人机验证，请使用“验证登录”完成后自动返回。'
+        : /INVALID_CREDENTIALS|INVALID_PASSWORD|INCORRECT_PASSWORD/.test(error.reason ?? '') ? '邮箱或密码未通过站点校验，请检查后重试。'
+        : `站点未接受登录请求（${error.status}）。可使用“验证登录”完成站点要求的验证。`;
+      const failure = new QuotaError('AUTH', message, error.status, error.reason);
+      failure.cause = error;
+      throw failure;
+    }
     throw error;
   }
   if (data.requires_2fa === true) {

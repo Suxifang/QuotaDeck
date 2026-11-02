@@ -16,6 +16,7 @@ export interface WidgetAccount {
   provider: string;
   metrics: WidgetMetric[];
   updatedLabel: string;
+  queryLabel: string;
   status: string;
   url: string;
 }
@@ -49,12 +50,15 @@ export function widgetData(data: SavedData, now = Date.now()): WidgetData {
           stale: old || !!state?.error || isSampleStale(metric, now),
         };
       });
-      const updatedLabel = validDate(fetched) ? new Intl.DateTimeFormat('zh-CN', {
+      const knownTime = validDate(fetched) && fetched <= now + 5 * 60_000;
+      const updatedLabel = knownTime ? new Intl.DateTimeFormat('zh-CN', {
         month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false,
-      }).format(new Date(fetched)) : '尚未更新';
+      }).format(new Date(fetched)) : '时间未知';
+      const status = state?.error ? '连接待检查' : !snapshot ? '打开应用查询' : metrics.some(metric => metric.stale) ? '待更新' : '上次查询';
+      const queryLabel = !snapshot ? status : !knownTime ? '查询时间未知'
+        : `${state?.error ? '查询失败' : status === '上次查询' ? '查询' : status} ${updatedLabel}`;
       return {
-        id: source.id, name: source.name, provider: PROVIDER_LABELS[source.resolvedKind ?? source.kind], metrics, updatedLabel,
-        status: state?.error ? '连接待检查' : !snapshot ? '打开应用查询' : metrics.some(metric => metric.stale) ? '待更新' : '上次查询',
+        id: source.id, name: source.name, provider: PROVIDER_LABELS[source.resolvedKind ?? source.kind], metrics, updatedLabel, queryLabel, status,
         url: `quotadeck:///?sourceId=${encodeURIComponent(source.id)}`,
       };
     });

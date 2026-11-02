@@ -2,7 +2,7 @@ import type { Credential, ErrorCode, Source } from '../domain/types';
 import { buildRequestUrl } from '../vendor/sub2api-mobile/request-url';
 
 export class QuotaError extends Error {
-  constructor(public code: ErrorCode, message: string, public status?: number) { super(message); this.name = 'QuotaError'; }
+  constructor(public code: ErrorCode, message: string, public status?: number, public reason?: string) { super(message); this.name = 'QuotaError'; }
 }
 
 export type Json = Record<string, unknown>;
@@ -89,11 +89,23 @@ export function createRequester(fetcher: typeof fetch = fetch): Requester {
         method: options.method ?? 'GET', headers, redirect: 'error', signal: controller.signal,
         ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}),
       });
-      if (response.status === 401) throw new QuotaError('AUTH', '登录已失效或密钥无效，请重新连接', 401);
-      if (response.status === 403) throw new QuotaError('FORBIDDEN', '当前凭据没有查看这项额度的权限', 403);
+      let reason: string | undefined;
+      if (!response.ok && [400, 401, 403].includes(response.status)) {
+        // Keep a bounded machine reason; never display a response that may echo credentials.
+        const body = await response.text();
+        if (body.length <= 64_000) {
+          try {
+            const data = object(JSON.parse(body));
+            const value = data?.reason ?? data?.error_code ?? data?.code;
+            if (typeof value === 'string' && /^[A-Z][A-Z0-9_]{0,79}$/.test(value)) reason = value;
+          } catch { /* Non-JSON error pages retain the HTTP status only. */ }
+        }
+      }
+      if (response.status === 401) throw new QuotaError('AUTH', '登录已失效或密钥无效，请重新连接', 401, reason);
+      if (response.status === 403) throw new QuotaError('FORBIDDEN', '当前凭据没有查看这项额度的权限', 403, reason);
       if (response.status === 429) throw new QuotaError('RATE_LIMIT', '查询较频繁，稍后会自动重试', 429);
       if (response.status === 404 || response.status === 405) throw new QuotaError('UNSUPPORTED', '站点未提供这个查询接口', response.status);
-      if (!response.ok) throw new QuotaError('NETWORK', `站点暂时不可用（${response.status}）`, response.status);
+      if (!response.ok) throw new QuotaError('NETWORK', `站点暂时不可用（${response.status}）`, response.status, reason);
       const text = await response.text();
       if (text.length > 4 * 1024 * 1024) throw new QuotaError('INVALID', '接口数据过大');
       try { return JSON.parse(text); } catch { throw new QuotaError('INVALID', '接口返回了网页或无法识别的数据'); }

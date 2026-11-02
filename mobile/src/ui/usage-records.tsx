@@ -24,7 +24,7 @@ export function UsageRecords({ source, state, onReconnect, connectUsage }: { sou
       </View>
       {state.loading ? <ActivityIndicator color={t.accent} style={{ width: 38, height: 38 }} /> : <IconButton icon={RefreshCw} label="刷新使用记录" size={38} onPress={state.refresh} />}
     </View>
-    {userLogin ? <UsageLogin sourceId={source.id} connect={connectUsage} onConnected={state.refresh} /> : state.error ? <Glass subtle style={{ padding: 18, gap: 12, borderRadius: 20 }}>
+    {userLogin ? <UsageLogin source={source} connect={connectUsage} onConnected={state.refresh} /> : state.error ? <Glass subtle style={{ padding: 18, gap: 12, borderRadius: 20 }}>
       <View style={[styles.row, { gap: 8 }]}><ListFilter size={17} color={t.amber} /><Text style={{ color: t.ink, fontSize: 14, fontWeight: '600' }}>{unsupported ? '此连接暂不支持记录' : '使用记录暂未更新'}</Text></View>
       <Text accessibilityRole="alert" style={{ color: t.secondary, fontSize: 12, lineHeight: 21 }}>{state.error.message}</Text>
       {state.result ? <Text style={{ color: t.muted, fontSize: 10 }}>下方仍是上次成功读取的记录。</Text> : null}

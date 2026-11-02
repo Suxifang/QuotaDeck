@@ -55,6 +55,8 @@ jobs:
         run: pod install
       - name: Build unsigned app
         run: bash tools/build-ios.sh
+      - name: Verify application and widget package
+        run: python3 tools/validate-ipa.py
       - uses: actions/upload-artifact@v4
         with:
           name: QuotaDeck-unsigned-IPA

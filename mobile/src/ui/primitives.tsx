@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { AccessibilityInfo, ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
+import { AccessibilityInfo, ActivityIndicator, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { GlassView, isLiquidGlassAvailable, isGlassEffectAPIAvailable } from 'expo-glass-effect';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { ArrowUpRight, X, type LucideIcon } from 'lucide-react-native';
-import Svg, { Path } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { radius, useTheme } from './theme';
 
@@ -15,9 +13,7 @@ export const styles = StyleSheet.create({
 });
 
 export function Logo({ size = 40 }: { size?: number }) {
-  return <LinearGradient colors={['#5598FF', '#2C6BDA']} style={{ width: size, height: size, borderRadius: size * 0.25, borderCurve: 'continuous', alignItems: 'center', justifyContent: 'center', boxShadow: '0px 5px 14px rgba(48,120,234,0.20)' }}>
-    <Svg width={size * .65} height={size * .65} viewBox="0 0 32 32"><Path d="M8 8.5h7a8 8 0 0 1 0 16H8V8.5Z" fill="none" stroke="white" strokeWidth="3.1" strokeLinejoin="round"/><Path d="m16 18 9 9M8 14h6M8 19h4" stroke="white" strokeWidth="3.1" strokeLinecap="round"/></Svg>
-  </LinearGradient>;
+  return <Image source={require('../../assets/icon.png')} accessibilityLabel="余度" style={{ width: size, height: size, borderRadius: size * .23, borderCurve: 'continuous' }} />;
 }
 
 export function useGlassPreferences() {

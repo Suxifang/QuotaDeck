@@ -11,6 +11,8 @@ import { Button, Glass, Logo, SectionLink, Sheet, styles } from './primitives';
 import { useTheme } from './theme';
 import notices from '../vendor/notices.json';
 import { WidgetSettings } from './widget-settings';
+import { UpdateSettings } from './update-settings';
+import { APP_VERSION, useUpdates } from '../updates/context';
 
 function Segments<T extends string | number>({ options, value, onChange }: { options: { value: T; label: string }[]; value: T; onChange: (value: T) => void }) {
   const t = useTheme(); return <View style={{ flexDirection: 'row', gap: 5, backgroundColor: t.input, borderRadius: 14, padding: 4 }}>{options.map(option => <Pressable key={option.value} onPress={() => onChange(option.value)} accessibilityRole="button" accessibilityState={{ selected: value === option.value }}
@@ -19,8 +21,9 @@ function Segments<T extends string | number>({ options, value, onChange }: { opt
 
 export function Settings({ controller }: { controller: QuotaController }) {
   const t = useTheme(); const prefs = controller.data.preferences;
+  const updates = useUpdates();
   const [toast, setToast] = useState('');
-  const [info, setInfo] = useState<'privacy' | 'credits' | 'history' | 'widgets'>();
+  const [info, setInfo] = useState<'privacy' | 'credits' | 'history' | 'widgets' | 'updates'>();
   const [showLicenses, setShowLicenses] = useState(false);
   async function exportConfig() {
     try {
@@ -34,7 +37,7 @@ export function Settings({ controller }: { controller: QuotaController }) {
     } catch { setToast('暂时无法导出，请稍后重试'); }
   }
   return <>
-    <View style={{ gap: 9 }}><Text style={{ color: t.muted, fontSize: 10, letterSpacing: 2 }}>PREFERENCES</Text><Text style={{ fontSize: 29, color: t.ink, fontWeight: '700', letterSpacing: -1 }}>按你的习惯。</Text><Text style={{ color: t.secondary, fontSize: 12, lineHeight: 20 }}>让余量，成为顺手的小工具。</Text></View>
+    <View style={{ gap: 9 }}><Text style={{ color: t.muted, fontSize: 10, letterSpacing: 2 }}>PREFERENCES</Text><Text style={{ fontSize: 29, color: t.ink, fontWeight: '700', letterSpacing: -1 }}>按你的习惯。</Text><Text style={{ color: t.secondary, fontSize: 12, lineHeight: 20 }}>让余度，成为顺手的小工具。</Text></View>
     <Glass style={{ padding: 21, gap: 20 }}>
       <View style={[styles.row, { gap: 9 }]}><Droplets size={18} color={t.accent} /><Text style={{ color: t.ink, fontSize: 14, fontWeight: '600' }}>外观</Text><Text style={{ color: t.muted, fontSize: 10 }}>Liquid Glass</Text></View>
       <Segments<Preferences['theme']> options={[{ value: 'light', label: '浅色' }, { value: 'dark', label: '深色' }, { value: 'system', label: '跟随系统' }]} value={prefs.theme} onChange={theme => controller.changePreferences({ theme })} />
@@ -51,6 +54,8 @@ export function Settings({ controller }: { controller: QuotaController }) {
       <View style={[styles.between, { borderTopWidth: 1, borderColor: t.line, paddingTop: 16 }]}><Text style={{ color: t.ink, fontSize: 13 }}>轻触反馈</Text><Switch accessibilityLabel="轻触反馈" value={prefs.haptics} onValueChange={haptics => controller.changePreferences({ haptics })} trackColor={{ true: t.accent }} /></View>
     </Glass>
     <Glass style={{ paddingHorizontal: 20, borderRadius: 26 }}>
+      <SectionLink title="版本更新" subtitle={updates.release ? `发现新版本 ${updates.release.version}` : `当前 ${APP_VERSION} · 下载并导入 LCSign`} icon={RefreshCw} onPress={() => setInfo('updates')} />
+      <View style={{ height: 1, backgroundColor: t.line }} />
       <SectionLink title="桌面与锁屏小组件" subtitle="抬眼查看余量，选择你关注的账号" icon={LayoutGrid} onPress={() => setInfo('widgets')} />
       <View style={{ height: 1, backgroundColor: t.line }} />
       <SectionLink title="导出站点配置" subtitle="方便留存，导出内容不含密钥与登录状态" icon={ArrowDownToLine} onPress={() => void exportConfig()} />
@@ -60,13 +65,14 @@ export function Settings({ controller }: { controller: QuotaController }) {
     </Glass>
     {toast ? <Text accessibilityRole="alert" style={{ color: t.accent, fontSize: 12, textAlign: 'center' }}>{toast}</Text> : null}
     <Pressable accessibilityRole="button" onPress={controller.isDemo ? controller.exitDemo : controller.enterDemo} style={[styles.row, { justifyContent: 'center', gap: 7, padding: 10 }]}><FlaskConical color={t.secondary} size={15} /><Text style={{ color: t.secondary, fontSize: 12 }}>{controller.isDemo ? '退出演示模式' : '查看演示模式'}</Text></Pressable>
-    <View style={{ alignItems: 'center', gap: 10, paddingTop: 3 }}><Logo size={32} /><Text style={{ color: t.muted, fontSize: 10 }}>余量 QuotaDeck · 0.1.0</Text></View>
-    {info ? <Sheet visible title={info === 'privacy' ? '数据与隐私' : info === 'credits' ? '开源致谢' : info === 'widgets' ? '桌面与锁屏' : '清空余量记录'} onClose={() => setInfo(undefined)}>
-      {info === 'widgets' ? <WidgetSettings controller={controller} /> : info === 'privacy' ? <>
-        <Info title="直接连接你的站点" text="应用从手机直接查询你添加的接口。没有 QuotaDeck 中转服务器，不需要注册账号。" />
+    <View style={{ alignItems: 'center', gap: 10, paddingTop: 3 }}><Logo size={32} /><Text style={{ color: t.muted, fontSize: 10 }}>余度 Yudu · {APP_VERSION}</Text></View>
+    {info ? <Sheet visible title={info === 'privacy' ? '数据与隐私' : info === 'credits' ? '开源致谢' : info === 'widgets' ? '桌面与锁屏' : info === 'updates' ? '版本更新' : '清空余量记录'} onClose={() => setInfo(undefined)}>
+      {info === 'updates' ? <UpdateSettings /> : info === 'widgets' ? <WidgetSettings controller={controller} /> : info === 'privacy' ? <>
+        <Info title="直接连接你的站点" text="应用从手机直接查询你添加的接口。没有余度中转服务器，不需要注册账号。" />
         <Info title="凭据留在本机" text="iOS 密钥与登录状态保存在系统钥匙串，设备解锁后可读；后台密码仅用于登录。网页预览的凭据只保留在当前页面内存中。" />
         <Info title="记录与导出" text="站点配置、最近成功额度及每天最后一条余量保存在本机，余量记录最多保留 90 天。导出配置不含凭据，也不含额度记录。" />
         <Info title="小组件" text="小组件与应用共享账号显示名称及最近额度，不共享密钥、登录状态或站点地址。演示数据只供应用内预览，不会写入小组件。" />
+        <Info title="版本更新" text="检查更新会向 GitHub 公开发行仓库请求版本信息，不携带站点配置或密钥。下载的 IPA 缓存在本机，签名和安装由你在 LCSign 中确认。" />
         <Info title="反代额度的时间" text="查询读取后台已经保存的额度采样。超过 15 分钟、没有采样时间或已过重置时间时，会提示采样待更新。" />
       </> : info === 'credits' ? <>
         <Info title="感谢这些 MIT 开源项目" text="复用了 sub2api-mobile 的接口地址处理、sub2api-dashboard 的额度映射与账号清洗，以及 dsh-gateway-wallet 的站点识别规则，并为本应用作了适配。" />

@@ -1,9 +1,11 @@
 """Use the existing Git credential helper without printing or persisting tokens.
 
-Usage: python tools/github-sync.py create|runs|jobs RUN_ID|download RUN_ID
+Usage: python tools/github-sync.py create|push|runs|jobs RUN_ID|download RUN_ID
+       python tools/github-sync.py release-setup|release-info|publish-release RUN_ID
 The user has authorized syncing QuotaDeck to their GitHub account.
 """
 import base64
+import hashlib
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 import io
@@ -59,6 +61,17 @@ try:
             if error.code != 404: raise
             data = api('/user/repos', {'name': 'QuotaDeck', 'private': True, 'description': '余量 · iOS quota dashboard for Sub2API relays and other API providers', 'auto_init': False})
             print(json.dumps({'created': True, 'repository': data['full_name'], 'private': data['private']}))
+    elif action == 'release-setup':
+        from release_channel import setup
+        setup(api, owner, ROOT)
+    elif action == 'release-info':
+        from release_channel import public_repo
+        release_repo = public_repo(api, owner)
+        releases = api('/repos/' + release_repo + '/releases?per_page=3')
+        print(json.dumps([{'tag': release['tag_name'], 'draft': release['draft'], 'url': release['html_url'], 'assets': [{'name': asset['name'], 'size': asset['size'], 'digest': asset.get('digest')} for asset in release['assets']]} for release in releases]))
+    elif action == 'publish-release':
+        from release_channel import publish
+        publish(api, opener, token, owner, ROOT, sys.argv[2])
     elif action == 'push':
         # This path is useful when github.com Git transport is unreachable but
         # the authenticated GitHub API is available. Preserve local Git objects.
@@ -141,7 +154,11 @@ try:
                     if Path(name).name == 'QuotaDeck-unsigned.ipa':
                         target = ROOT / 'artifacts' / 'QuotaDeck-unsigned.ipa'
                         target.parent.mkdir(exist_ok=True)
-                        target.write_bytes(package.read(name)); print('Saved', target)
+                        payload = package.read(name)
+                        target.write_bytes(payload)
+                        run = api('/repos/' + repo + '/actions/runs/' + sys.argv[2])
+                        (ROOT / '.cache' / 'ipa-download.json').write_text(json.dumps({'runId': int(sys.argv[2]), 'headSha': run['head_sha'], 'sha256': hashlib.sha256(payload).hexdigest()}), encoding='utf-8')
+                        print('Saved', target)
     else: raise SystemExit('Unknown action')
 except urllib.error.HTTPError as error:
     raise SystemExit('GitHub API returned HTTP ' + str(error.code))

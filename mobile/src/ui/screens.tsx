@@ -14,11 +14,13 @@ import { DetailSheet } from './detail-sheet';
 import { Settings } from './settings';
 import { useTheme } from './theme';
 import { Ambient } from './ambient';
+import { useUpdates } from '../updates/context';
 
 type Tab = 'overview' | 'connections' | 'settings';
 
 export function Deck({ controller, tab }: { controller: QuotaController; tab: Tab }) {
   const t = useTheme(); const insets = useSafeAreaInsets();
+  const updates = useUpdates();
   const router = useRouter();
   const { sourceId } = useLocalSearchParams<{ sourceId?: string }>();
   const [connection, setConnection] = useState<{ existing?: Source }>();
@@ -41,7 +43,7 @@ export function Deck({ controller, tab }: { controller: QuotaController; tab: Ta
       refreshControl={tab !== 'settings' ? <RefreshControl refreshing={refreshing} onRefresh={() => void refresh()} tintColor={t.accent} colors={[t.accent]} /> : undefined}
       contentContainerStyle={{ paddingTop: insets.top + 20, paddingBottom: 112 + bottom, paddingHorizontal: 22, width: '100%', maxWidth: 560, alignSelf: 'center', gap: 20 }}>
       <View style={styles.between}>
-        <View style={[styles.row, { gap: 10 }]}><Logo size={33} /><Text style={{ fontSize: 19, fontWeight: '700', color: t.ink, letterSpacing: .5 }}>余量</Text><Text style={{ fontSize: 10, color: t.secondary, letterSpacing: .6, marginTop: 4 }}>QuotaDeck</Text></View>
+        <View style={[styles.row, { gap: 10 }]}><Logo size={33} /><Text style={{ fontSize: 19, fontWeight: '700', color: t.ink, letterSpacing: .5 }}>余度</Text><Text style={{ fontSize: 10, color: t.secondary, letterSpacing: 1.6, marginTop: 4 }}>YUDU</Text></View>
         <View style={[styles.row, { gap: 8 }]}>
           <IconButton icon={RefreshCw} label="刷新全部额度" onPress={() => void refresh()} disabled={refreshing || !sources.length} size={37} />
           <IconButton icon={Plus} label="添加连接" onPress={add} active size={37} />
@@ -51,6 +53,7 @@ export function Deck({ controller, tab }: { controller: QuotaController; tab: Ta
         <View style={[styles.row, { gap: 7 }]}><FlaskConical size={14} color={t.amber} /><Text style={{ color: t.secondary, fontSize: 11 }}>演示模式 · 以下均为示例数据</Text></View>
         <Pressable accessibilityRole="button" accessibilityLabel="退出演示" onPress={() => { controller.exitDemo(); setDetailId(undefined); }}><Text style={{ color: t.accent, fontSize: 11, fontWeight: '600' }}>退出</Text></Pressable>
       </View></Glass> : null}
+      {tab !== 'settings' && updates.autoCheck && updates.release ? <Glass subtle style={{ paddingHorizontal: 15, borderRadius: 17 }}><Pressable accessibilityRole="button" accessibilityLabel="查看新版本" onPress={() => router.push('/settings')} style={[styles.between, { minHeight: 48, gap: 10 }]}><Text style={{ color: t.accent, fontSize: 12 }}>余度 {updates.release.version} 已发布</Text><View style={[styles.row, { gap: 5 }]}><Text style={{ color: t.secondary, fontSize: 11 }}>查看更新</Text><ChevronRight size={14} color={t.secondary} /></View></Pressable></Glass> : null}
       {controller.storageError ? <Text accessibilityRole="alert" style={{ color: t.red, fontSize: 12, lineHeight: 20 }}>{controller.storageError}</Text> : null}
       {!controller.ready ? <ActivityIndicator color={t.accent} style={{ marginTop: 100 }} /> : tab === 'overview' ? <>
         <View style={{ gap: 8 }}>

@@ -19,7 +19,7 @@ const FocusLayout = (props: WidgetData, environment: WidgetEnvironment<Configura
   const color = metric?.stale ? muted : metric?.percent != null && metric.percent <= props.threshold ? dark ? '#F1CF94' : '#815618' : dark ? '#B8DAC1' : '#256D5E';
   if (accessory) {
     return <VStack alignment="leading" spacing={3} modifiers={[widgetURL(account?.url ?? 'quotadeck:///'), privacySensitive()]}>
-      <Text modifiers={[font({ size: 11, weight: 'medium' }), lineLimit(1)]}>{account?.name ?? '余量'}</Text>
+      <Text modifiers={[font({ size: 11, weight: 'medium' }), lineLimit(1)]}>{account?.name ?? '余度'}</Text>
       <Text modifiers={[font({ size: 22, weight: 'semibold' }), monospacedDigit(), lineLimit(1), minimumScaleFactor(.6)]}>{metric?.value ?? '打开应用连接'}</Text>
       <Text modifiers={[font({ size: 9 }), lineLimit(1)]}>{account ? `${account.status} · ${account.updatedLabel}` : '添加你的额度账号'}</Text>
     </VStack>;
@@ -30,7 +30,7 @@ const FocusLayout = (props: WidgetData, environment: WidgetEnvironment<Configura
     widgetURL(account?.url ?? 'quotadeck:///'), privacySensitive(),
   ]}>
     <HStack spacing={5}>
-      <Text modifiers={[font({ size: 10, weight: 'semibold' }), foregroundStyle(ink), lineLimit(1)]}>{account?.name ?? '余量'}</Text>
+      <Text modifiers={[font({ size: 10, weight: 'semibold' }), foregroundStyle(ink), lineLimit(1)]}>{account?.name ?? '余度'}</Text>
       <Spacer />
       <Text modifiers={[font({ size: 10 }), foregroundStyle(muted)]}>↗</Text>
     </HStack>
@@ -41,7 +41,7 @@ const FocusLayout = (props: WidgetData, environment: WidgetEnvironment<Configura
     {secondaryMetric ? <HStack spacing={3}><Text modifiers={[font({ size: 9 }), foregroundStyle(muted), lineLimit(1)]}>{secondaryMetric.label}</Text><Spacer /><Text modifiers={[font({ size: 10, weight: 'medium' }), foregroundStyle(ink), monospacedDigit(), lineLimit(1)]}>{secondaryMetric.value}</Text></HStack> : null}
     {!secondaryMetric && metric?.resetText ? <Text modifiers={[font({ size: 8 }), foregroundStyle(muted), lineLimit(1)]}>{metric.resetText}</Text> : null}
     <Spacer />
-    <Text modifiers={[font({ size: 8 }), foregroundStyle(muted), lineLimit(1)]}>{account ? `${account.status} · ${account.updatedLabel}` : '打开余量，连接第一个站点'}</Text>
+    <Text modifiers={[font({ size: 8 }), foregroundStyle(muted), lineLimit(1)]}>{account ? `${account.status} · ${account.updatedLabel}` : '打开余度，连接第一个站点'}</Text>
   </VStack>;
 };
 

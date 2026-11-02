@@ -40,7 +40,7 @@ export function Deck({ controller, tab }: { controller: QuotaController; tab: Ta
     </View>
     <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled"
       refreshControl={tab !== 'settings' ? <RefreshControl refreshing={refreshing} onRefresh={() => void refresh()} tintColor={t.accent} colors={[t.accent]} /> : undefined}
-      contentContainerStyle={{ paddingTop: insets.top + 20, paddingBottom: 112 + bottom, paddingHorizontal: 22, width: '100%', maxWidth: 560, alignSelf: 'center', gap: 25 }}>
+      contentContainerStyle={{ paddingTop: insets.top + 20, paddingBottom: 112 + bottom, paddingHorizontal: 22, width: '100%', maxWidth: 560, alignSelf: 'center', gap: 20 }}>
       <View style={styles.between}>
         <View style={[styles.row, { gap: 10 }]}><Logo size={33} /><Text style={{ fontSize: 19, fontWeight: '700', color: t.ink, letterSpacing: .5 }}>余量</Text><Text style={{ fontSize: 10, color: t.secondary, letterSpacing: .6, marginTop: 4 }}>QuotaDeck</Text></View>
         <View style={[styles.row, { gap: 8 }]}>
@@ -60,7 +60,7 @@ export function Deck({ controller, tab }: { controller: QuotaController; tab: Ta
           <Text style={{ color: t.secondary, fontSize: 12, lineHeight: 20 }}>分散的 API 额度，此刻尽在掌握。</Text>
         </View>
         {sources.length ? <>
-          <Glass subtle style={{ paddingVertical: 19, borderRadius: 24 }}><View style={{ flexDirection: 'row' }}>
+          <Glass subtle style={{ paddingVertical: 16, borderRadius: radius.card }}><View style={{ flexDirection: 'row' }}>
             <Stat value={sources.length} title="监控账号" color={t.ink} /><Stat value={healthy} title="状态正常" color={t.mint} divider /><Stat value={needsAttention} title="需要留意" color={needsAttention ? t.amber : t.ink} divider />
           </View></Glass>
           <View style={[styles.between, { marginTop: 1 }]}>

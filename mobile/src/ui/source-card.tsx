@@ -35,7 +35,7 @@ export function SourceCard({ source, state, threshold, onPress }: { source: Sour
   const remaining = primary ? percentRemaining(primary) : undefined;
   return <Pressable accessibilityRole="button" accessibilityLabel={`查看${source.name}额度详情`} onPress={onPress}
     style={({ pressed }) => ({ opacity: source.enabled ? pressed ? .84 : 1 : .55, transform: [{ scale: pressed ? .992 : 1 }] })}>
-    <Glass style={{ padding: 22, gap: 18 }}>
+    <Glass style={{ padding: 21, gap: 16 }}>
       {source.pinned && !t.dark ? <LinearGradient pointerEvents="none" colors={['rgba(225,238,255,0.32)', 'rgba(255,255,255,0)']} style={{ position: 'absolute', left: 0, top: 0, right: 0, height: 150 }} /> : null}
       <View style={[styles.between, { gap: 10 }]}>
         <View style={[styles.row, { gap: 11, flex: 1 }]}><ProviderMark source={source} />

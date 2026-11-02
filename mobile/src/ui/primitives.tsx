@@ -71,10 +71,10 @@ export function Chip({ label, color, icon: Icon }: { label: string; color?: 'blu
   </View>;
 }
 
-export function Field({ label, hint, ...input }: TextInputProps & { label: string; hint?: string }) {
+export function Field({ label, hint, hideLabel = false, ...input }: TextInputProps & { label: string; hint?: string; hideLabel?: boolean }) {
   const t = useTheme();
   return <View style={{ gap: 8 }}>
-    <Text style={[styles.label, { color: t.ink }]}>{label}</Text>
+    {!hideLabel ? <Text style={[styles.label, { color: t.ink }]}>{label}</Text> : null}
     <TextInput placeholderTextColor={t.muted} autoCapitalize="none" autoCorrect={false} {...input}
       accessibilityLabel={label} style={[{ minHeight: 51, borderRadius: radius.control, borderCurve: 'continuous', paddingHorizontal: 15, paddingVertical: 12, backgroundColor: t.input,
         borderWidth: 1, borderColor: t.line, color: t.ink, fontSize: 14 }, input.style]} />
@@ -88,14 +88,14 @@ export function Sheet({ visible, title, subtitle, onClose, children }: React.Pro
     <View style={{ flex: 1, backgroundColor: t.dark ? 'rgba(0,5,15,0.65)' : 'rgba(39,60,85,0.22)', justifyContent: 'flex-end' }}>
       <Pressable accessibilityLabel="关闭面板" onPress={onClose} style={StyleSheet.absoluteFill} />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ width: '100%', maxWidth: 580, maxHeight: '94%', alignSelf: 'center' }}>
-        <View style={{ backgroundColor: t.sheet, borderTopLeftRadius: radius.sheet, borderTopRightRadius: radius.sheet, borderCurve: 'continuous', borderWidth: 1, borderColor: t.border, overflow: 'hidden' }}>
+        <View style={{ flexShrink: 1, backgroundColor: t.sheet, borderTopLeftRadius: radius.sheet, borderTopRightRadius: radius.sheet, borderCurve: 'continuous', borderWidth: 1, borderColor: t.border, overflow: 'hidden' }}>
           <View style={{ alignSelf: 'center', width: 34, height: 4, borderRadius: 2, backgroundColor: t.muted, opacity: .3, marginTop: 10 }} />
           <View style={[styles.between, { paddingHorizontal: 24, paddingTop: 18, paddingBottom: 18, gap: 12 }]}>
             <View style={{ flex: 1 }}><Text style={{ fontSize: 25, fontWeight: '700', letterSpacing: -.8, color: t.ink }}>{title}</Text>
               {subtitle ? <Text numberOfLines={2} style={{ fontSize: 12, color: t.secondary, marginTop: 5 }}>{subtitle}</Text> : null}</View>
             <IconButton icon={X} label="关闭" onPress={onClose} size={36} />
           </View>
-          <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: Math.max(insets.bottom, 24) + 12, gap: 20 }}>
+          <ScrollView style={{ flexShrink: 1 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: Math.max(insets.bottom, 24) + 12, gap: 20 }}>
             {children}
           </ScrollView>
         </View>

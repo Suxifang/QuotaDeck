@@ -54,7 +54,7 @@ export function parseAdmin(raw: unknown, source: Source, now: string): QuotaSnap
       if (n !== undefined) (normalized as Record<string, unknown>)[key] = n;
     }
   }
-  for (const key of ['codex_5h_reset_after_seconds', 'codex_7d_reset_after_seconds']) {
+  for (const key of ['codex_5h_reset_after_seconds', 'codex_7d_reset_after_seconds'] as const) {
     const seconds = nonnegative(normalized[key]);
     if (seconds !== undefined && seconds > 31536_000) delete normalized[key];
   }

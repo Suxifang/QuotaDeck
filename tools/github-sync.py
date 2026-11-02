@@ -15,6 +15,7 @@ import subprocess
 import sys
 import urllib.error
 import urllib.request
+from urllib.parse import urlparse
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -26,7 +27,14 @@ token = fields.get('password')
 if not token:
     raise SystemExit('No existing GitHub credential is available.')
 proxy = subprocess.run(['git', 'config', '--get', 'http.proxy'], text=True, capture_output=True, cwd=ROOT).stdout.strip()
-opener = urllib.request.build_opener(urllib.request.ProxyHandler({'https': proxy, 'http': proxy}) if proxy else urllib.request.ProxyHandler())
+class SafeRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        redirected = super().redirect_request(req, fp, code, msg, headers, newurl)
+        if redirected and urlparse(req.full_url).netloc != urlparse(newurl).netloc:
+            redirected.remove_header('Authorization')
+        return redirected
+
+opener = urllib.request.build_opener(urllib.request.ProxyHandler({'https': proxy, 'http': proxy}) if proxy else urllib.request.ProxyHandler(), SafeRedirect())
 
 def api(path, body=None, raw=False, method=None):
     url = path if path.startswith('https://') else 'https://api.github.com' + path

@@ -111,12 +111,12 @@ export function ConnectionSheet({ controller, existing, onClose }: { controller:
       <View style={styles.between}><Text style={[styles.label, { color: t.ink }]}>{admin ? '管理密钥' : 'API Key'}</Text>
         <IconButton icon={showSecret ? EyeOff : Eye} label={showSecret ? '隐藏密钥' : '显示密钥'} size={32} onPress={() => setShowSecret(value => !value)} />
       </View>
-      <Field label={admin ? '输入管理密钥' : '输入 API Key'} placeholder={admin ? 'x-api-key 管理密钥' : 'sk-…'} value={secret} onChangeText={edit(setSecret)}
+      <Field hideLabel label={admin ? '输入管理密钥' : '输入 API Key'} placeholder={admin ? 'x-api-key 管理密钥' : 'sk-…'} value={secret} onChangeText={edit(setSecret)}
         secureTextEntry={!showSecret} editable={!busy && !saving} textContentType="none" autoComplete="off" />
     </View>}
     {!existing ? <Field label="显示名称（可选）" placeholder={admin ? '例如：我的 Plus' : '例如：Pro 工作站'} value={name} onChangeText={setName} editable={!saving} /> : null}
     {admin && !existing ? <View style={{ gap: 12 }}>
-      <Pressable accessibilityRole="button" disabled={busy || saving} onPress={() => setAdvanced(value => !value)} style={styles.between}>
+      <Pressable accessibilityRole="button" disabled={busy || saving} onPress={() => { setAdvanced(value => !value); if (advanced) edit(setAccountId)(''); }} style={styles.between}>
         <Text style={{ color: t.secondary, fontSize: 12 }}>通过账号 ID 添加</Text><ChevronDown size={16} color={t.muted} />
       </Pressable>
       {advanced ? <Field label="上游账号 ID（可选）" value={accountId} onChangeText={edit(setAccountId)} keyboardType="number-pad" editable={!busy && !saving}

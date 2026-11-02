@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "QuotaDeck",
+    "slug": "quotadeck",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.quotadeck.mobile",
+      "buildNumber": "1",
+      "infoPlist": {
+        "CFBundleDisplayName": "余量",
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocalNetworkUsageDescription": "连接你在局域网内添加的额度查询站点。",
+        "NSAppTransportSecurity": {
+          "NSAllowsLocalNetworking": true
+        }
+      }
+    },
+    "android": {
+      "package": "app.quotadeck.mobile",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#EDF3FA"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "name": "余量 · QuotaDeck",
+      "shortName": "余量",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-sharing",
+      "expo-router"
+    ],
+    "scheme": "quotadeck"
+  }
+}

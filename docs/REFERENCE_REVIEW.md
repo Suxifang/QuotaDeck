@@ -1,0 +1,23 @@
+# 参考项目与实际复用
+
+检索及检查日期：2026-11-02。原始浅克隆保存在本项目 `.references/`，不随应用发布。
+
+| 项目 | 已检查内容 | 处理 |
+| --- | --- | --- |
+| ckken/sub2api-mobile | Expo、管理密钥、账号分页、SecureStore、请求 URL 去重 | MIT；实际移植请求 URL 模块，并沿用后台接入方式 |
+| CrossStar/sub2api-dashboard | Codex 配额、时间锚点、白名单账号清洗 | MIT；实际移植 quota-mapper、account-normalizer、类型和错误模块 |
+| MuAllen/dsh-gateway-wallet | 无密钥站点识别、Sub2API 和 New API 账本 | MIT；实际复用 fingerprint 模块，添加路径和响应校验 |
+| nextroad-dev/AIUsage | 手机额度 UI、余额适配器、未签名 IPA 工作流 | 未发现明确 LICENSE；参考功能和公开接口，不复制实现 |
+| RebornQ/fl_api_hub | Flutter 站点适配器、平台状态、IPA | AGPL-3.0；阅读比较，未引入 Dart 代码；其 iOS 标注未测试 |
+| Regard1ess/sub2api-ios | SwiftUI 管理端、Keychain | 未见明确 LICENSE；阅读比较，未复制 |
+| blueskycrb/sub2api-ios | SwiftUI 用户端、2FA、GitHub iOS 构建 | 未见标准许可证；阅读比较，未复制 |
+| mcxiaochenn/AiUsage | Flutter 本地监控、多币种、演示和缓存 | MIT；阅读比较，未复制 |
+| bejix/upstream-ops | 多站管理功能范围 | 未见明确 LICENSE；未复制 |
+
+实际复用版本：
+
+- sub2api-mobile: `3177500f74b005ed32512d3f79a7a24d05eac352`
+- dsh-gateway-wallet: `c239009846d356bde8dbfa1f4b2bcf651d9c7439`
+- sub2api-dashboard: `b8824f0f9427d3085a6fd96bb7f612e5869d8a7c`
+
+改进：统一数据记录、单个账号独立刷新、查询时间与采样时间分开、超时和错误分类、站点内请求约束、先检查公共响应再发送凭据、原生液态玻璃与无障碍回退、手机安全存储。没有复制上游响应中的 credentials 或任意 extra 数据到缓存。

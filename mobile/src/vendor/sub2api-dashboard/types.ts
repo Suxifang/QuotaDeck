@@ -1,0 +1,31 @@
+// CrossStar/sub2api-dashboard, MIT. Native-only type subset.
+export type RawUpstreamAccount = Record<string, unknown> & { id?: unknown };
+export type NormalizedAccountSnapshot = {
+  id: string | number;
+  platform?: string | number | boolean;
+  provider?: string | number | boolean;
+  type?: string | number | boolean;
+  auth_type?: string | number | boolean;
+  credential_type?: string | number | boolean;
+  status?: string | number | boolean;
+  availability?: string | number | boolean;
+  available?: string | number | boolean;
+  quota_used?: string | number | boolean;
+  quota_limit?: string | number | boolean;
+  quota_resets_at?: string | number | boolean;
+  quota_daily_used?: string | number | boolean;
+  quota_daily_limit?: string | number | boolean;
+  quota_daily_resets_at?: string | number | boolean;
+  quota_monthly_used?: string | number | boolean;
+  quota_monthly_limit?: string | number | boolean;
+  quota_monthly_resets_at?: string | number | boolean;
+  codex_5h_used_percent?: string | number | boolean;
+  codex_5h_reset_after_seconds?: string | number | boolean;
+  codex_5h_window_minutes?: string | number | boolean;
+  codex_5h_reset_at?: string | number | boolean;
+  codex_7d_used_percent?: string | number | boolean;
+  codex_7d_reset_after_seconds?: string | number | boolean;
+  codex_7d_window_minutes?: string | number | boolean;
+  codex_7d_reset_at?: string | number | boolean;
+  codex_usage_updated_at?: string | number | boolean;
+};

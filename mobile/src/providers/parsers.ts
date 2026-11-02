@@ -2,6 +2,7 @@ import type { CustomMapping, QuotaMetric, QuotaSnapshot, Source } from '../domai
 import { atPath, date, nonnegative, numeric, object, QuotaError, string, unwrap } from './transport';
 import { normalizeAccount } from '../vendor/sub2api-dashboard/account-normalizer';
 import { codexQuota, isOpenAiOAuth, localQuota } from '../vendor/sub2api-dashboard/quota-mapper';
+import { newApiCurrency } from './currency';
 
 const missing = () => new QuotaError('UNSUPPORTED', '这个接口没有提供可读取的额度；可尝试其他接入方式');
 const normalizeMetric = (metric: QuotaMetric): QuotaMetric => {
@@ -80,25 +81,8 @@ export function parseAdmin(raw: unknown, source: Source, now: string): QuotaSnap
 
 export function parseNewApi(raw: unknown, statusRaw: unknown, source: Source, now: string): QuotaSnapshot {
   const data = unwrap(raw);
-  const status = unwrap(statusRaw);
   if (data.object !== 'token_usage') throw missing();
-  const perUnit = nonnegative(status.quota_per_unit);
-  if (!perUnit) throw new QuotaError('INVALID', '站点未提供额度换算比例，无法准确显示金额');
-  const mode = string(status.quota_display_type)?.toUpperCase() ?? (status.display_in_currency === false ? 'TOKENS' : 'USD');
-  let factor = 1 / perUnit;
-  let unit = 'USD';
-  if (mode === 'TOKENS') { factor = 1; unit = 'tokens'; }
-  if (mode === 'CNY') {
-    const rate = nonnegative(status.usd_exchange_rate);
-    if (!rate) throw new QuotaError('INVALID', '站点未提供人民币换算比例');
-    factor = rate / perUnit; unit = 'CNY';
-  }
-  if (mode === 'CUSTOM') {
-    const rate = nonnegative(status.custom_currency_exchange_rate);
-    const symbol = string(status.custom_currency_symbol);
-    if (!rate || !symbol) throw new QuotaError('INVALID', '站点未提供自定义单位的换算规则');
-    factor = rate / perUnit; unit = symbol;
-  }
+  const { factor, unit } = newApiCurrency(statusRaw);
   const convert = (value: unknown) => { const n = nonnegative(value); return n === undefined ? undefined : n * factor; };
   const remaining = convert(data.total_available);
   const used = convert(data.total_used);

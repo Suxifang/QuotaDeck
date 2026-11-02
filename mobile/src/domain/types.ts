@@ -75,6 +75,32 @@ export interface HistoryPoint {
   metrics: { id: string; remaining?: number; used?: number; unit: Unit }[];
 }
 
+/** A display-only projection. Request bodies, IPs and credentials are never retained. */
+export interface UsageRecord {
+  id: string;
+  model: string;
+  createdAt?: string;
+  cost?: { value: number; unit: Unit; kind: 'actual' | 'standard' };
+  inputTokens?: number;
+  outputTokens?: number;
+  cacheReadTokens?: number;
+  cacheWriteTokens?: number;
+  firstTokenMs?: number;
+  durationMs?: number;
+  reasoningEffort?: string;
+  stream?: boolean;
+  failed?: boolean;
+}
+
+export interface UsagePage {
+  records: UsageRecord[];
+  page: number;
+  nextPage?: number;
+  recentOnly: boolean;
+  notice?: string;
+  fetchedAt: string;
+}
+
 export interface Preferences {
   theme: 'light' | 'dark' | 'system';
   refreshSeconds: 30 | 60 | 120 | 300;

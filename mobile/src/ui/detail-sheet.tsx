@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Linking, Pressable, Switch, Text, View } from 'react-native';
-import { ExternalLink, KeyRound, RefreshCw, Trash2 } from 'lucide-react-native';
+import { ChevronDown, ExternalLink, KeyRound, RefreshCw, Trash2 } from 'lucide-react-native';
 import Svg, { Circle, Line, Path } from 'react-native-svg';
 import type { HistoryPoint, Source } from '../domain/types';
 import { PROVIDER_LABELS } from '../domain/types';
@@ -9,6 +9,8 @@ import type { QuotaController } from '../state/useQuota';
 import { Button, Chip, Field, Glass, Sheet, styles } from './primitives';
 import { Meter } from './source-card';
 import { useTheme } from './theme';
+import { useUsageRecords } from '../state/useUsageRecords';
+import { UsageRecords } from './usage-records';
 
 function timestamp(value?: string) { return value ? new Date(value).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '未提供'; }
 function dayId(date: Date) { return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`; }
@@ -43,13 +45,16 @@ export function DetailSheet({ source, controller, onClose, onReconnect }: { sour
   const [confirmRemove, setConfirmRemove] = useState(false);
   const [removeError, setRemoveError] = useState('');
   const [metricId, setMetricId] = useState<string>();
-  const [section, setSection] = useState<'overview' | 'history' | 'manage'>('overview');
+  const kind = source.resolvedKind ?? source.kind;
+  const [section, setSection] = useState<'overview' | 'usage' | 'manage'>(controller.isDemo || kind === 'sub2-admin' || kind === 'newapi' ? 'usage' : 'overview');
+  const [showHistory, setShowHistory] = useState(false);
   const state = controller.data.states[source.id]; const snapshot = state?.snapshot;
   const primary = snapshot?.metrics.find(metric => metric.id === metricId) ?? snapshot?.metrics[0];
   const demo = controller.isDemo;
-  return <Sheet visible title={source.name} subtitle={PROVIDER_LABELS[source.resolvedKind ?? source.kind]} onClose={onClose}>
+  const usage = useUsageRecords(source.id, section === 'usage', demo, controller.loadUsage);
+  return <Sheet visible title={source.name} subtitle={PROVIDER_LABELS[kind]} onClose={onClose} scrollKey={`${section}:${usage.page}`}>
     <View style={{ flexDirection: 'row', padding: 4, gap: 4, borderRadius: 14, borderCurve: 'continuous', backgroundColor: t.input }}>
-      {([{ id: 'overview', label: '额度概览' }, { id: 'history', label: '余量记录' }, ...(!demo ? [{ id: 'manage' as const, label: '连接管理' }] : [])] as const).map(item => <Pressable key={item.id} accessibilityRole="tab" accessibilityLabel={item.label} accessibilityState={{ selected: section === item.id }} onPress={() => setSection(item.id)}
+      {([{ id: 'overview', label: '额度' }, { id: 'usage', label: '使用记录' }, ...(!demo ? [{ id: 'manage' as const, label: '管理' }] : [])] as const).map(item => <Pressable key={item.id} accessibilityRole="tab" accessibilityLabel={item.label} accessibilityState={{ selected: section === item.id }} onPress={() => setSection(item.id)}
         style={{ flex: 1, alignItems: 'center', paddingVertical: 11, borderRadius: 10, borderCurve: 'continuous', backgroundColor: section === item.id ? t.selected : 'transparent' }}>
         <Text style={{ color: section === item.id ? t.ink : t.secondary, fontSize: 12, fontWeight: section === item.id ? '600' : '400' }}>{item.label}</Text>
       </Pressable>)}
@@ -76,9 +81,10 @@ export function DetailSheet({ source, controller, onClose, onReconnect }: { sour
     <Text style={{ color: t.muted, fontSize: 10 }}>最近成功查询：{timestamp(snapshot?.fetchedAt)}</Text>
     <View style={{ flexDirection: 'row', gap: 10 }}><View style={{ flex: 1 }}><Button title="刷新额度" icon={RefreshCw} loading={state?.refreshing} disabled={!source.enabled || demo} onPress={() => void controller.refreshOne(source.id)} /></View>
       <View style={{ flex: 1 }}><Button title="打开站点" secondary icon={ExternalLink} disabled={demo} onPress={() => void Linking.openURL(source.baseUrl).catch(() => {})} /></View></View>
+    <Pressable accessibilityRole="button" accessibilityLabel="每日余量快照" accessibilityState={{ expanded: showHistory }} onPress={() => setShowHistory(value => !value)} style={[styles.between, { paddingVertical: 12 }]}><Text style={{ color: t.ink, fontSize: 13, fontWeight: '600' }}>每日余量快照</Text><ChevronDown size={17} color={t.muted} style={{ transform: [{ rotate: showHistory ? '180deg' : '0deg' }] }} /></Pressable>
     </> : null}
-    {section === 'history' && primary ? <>
-      <View style={{ gap: 7 }}><Text style={{ color: t.ink, fontSize: 21, fontWeight: '600', letterSpacing: -.5 }}>每天，留下一点记录。</Text><Text style={{ color: t.secondary, fontSize: 11, lineHeight: 20 }}>保存每天最后一次查询的额度，方便回看变化。</Text></View>
+    {section === 'usage' ? <UsageRecords source={source} state={usage} onReconnect={() => onReconnect(source)} /> : null}
+    {section === 'overview' && showHistory && primary ? <>
       <Glass subtle style={{ padding: 20, gap: 15 }}>
       <Text style={{ color: t.ink, fontSize: 14, fontWeight: '600' }}>近七天 · 余量记录</Text>
       {(snapshot?.metrics.length ?? 0) > 1 ? <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>{snapshot?.metrics.map(metric => <Pressable key={metric.id} onPress={() => setMetricId(metric.id)} accessibilityRole="button"
@@ -94,7 +100,7 @@ export function DetailSheet({ source, controller, onClose, onReconnect }: { sour
         {!(controller.data.history[source.id]?.length) ? <Text style={{ color: t.secondary, fontSize: 12, paddingVertical: 20 }}>开始查询后，这里会出现记录。</Text> : null}
       </Glass>
       <Text style={{ color: t.muted, fontSize: 10, lineHeight: 19 }}>展示最近七条每日快照。“周期已用”来自所选额度周期；重置时会变化。这里不是逐笔请求日志或实际扣费账单。</Text>
-    </> : section === 'history' ? <Text style={{ color: t.secondary, fontSize: 13, lineHeight: 22 }}>还没有可记录的额度，先在“额度概览”中查询一次。</Text> : null}
+    </> : section === 'overview' && showHistory ? <Text style={{ color: t.secondary, fontSize: 13, lineHeight: 22 }}>还没有可记录的额度，先刷新查询一次。</Text> : null}
     {!demo && section === 'manage' ? <>
       <Field label="显示名称" value={name} onChangeText={setName} onBlur={() => { if (name.trim() && name.trim() !== source.name) controller.changeSource(source.id, { name: name.trim() }); }} />
       <Glass subtle style={{ paddingHorizontal: 18, borderRadius: 22 }}>

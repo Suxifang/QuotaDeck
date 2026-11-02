@@ -10,6 +10,8 @@ import { deleteCredential, EMPTY_DATA, readCredential, readData, saveData, write
 import { createSessionRenewal } from './session';
 import { syncWidgets } from '../widgets/sync';
 import type { WidgetSyncResult } from '../widgets/publisher';
+import { fetchUsage } from '../providers/usage';
+import { createUsageReader } from './usage-reader';
 
 export function useQuota() {
   const [saved, setSaved] = useState<SavedData>(EMPTY_DATA);
@@ -34,6 +36,12 @@ export function useQuota() {
   const renew = useCallback(async (source: Source, credential: Credential) => {
     return sessions.current.renew(source, credential);
   }, []);
+
+  const loadUsage = useRef(createUsageReader({
+    source: id => ref.current.sources.find(source => source.id === id),
+    generation: id => generations.current.get(id) ?? 0,
+    read: readCredential, renew, fetch: fetchUsage,
+  })).current;
 
   const refreshOne = useCallback(async (id: string) => {
     const source = ref.current.sources.find(item => item.id === id);
@@ -155,7 +163,7 @@ export function useQuota() {
   return { data: demo ? { ...demo, preferences: saved.preferences } : saved, saved, ready, storageError, widgetError, widgetSyncing, widgetSyncResult, publishWidgets,
     isDemo: !!demo, enterDemo: () => setDemo(createDemo()), exitDemo: () => setDemo(null),
     refreshAll: async () => { if (demo) setDemo(createDemo()); else await refreshAll(); },
-    refreshOne, addSources, changeSource, removeSource, reconnect, changePreferences,
+    refreshOne, loadUsage, addSources, changeSource, removeSource, reconnect, changePreferences,
     clearHistory: () => update(data => ({ ...data, history: {} })), DEFAULT_PREFERENCES };
 }
 

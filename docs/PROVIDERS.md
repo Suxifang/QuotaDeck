@@ -28,6 +28,17 @@
 
 登录状态按站点共用，多个上游账号并发失效时合并刷新；删除最后一个监控后移除凭据。普通配置只存显式清洗后的额度字段，不落盘上游 credentials 或任意 extra。
 
+## 逐次使用记录
+
+- Sub2API 反代：`GET /api/v1/admin/usage?account_id=ID&page=N&page_size=20&sort_by=created_at&sort_order=desc`，沿用管理密钥或管理员会话。逐行校验返回的 `account_id`；任何一条账号不符或缺失都拒绝显示，不回退到全站记录。按后台分页，未把列表的局部费用合计为今日总额。
+- New API：`GET /api/log/token`，API Key 只在 Bearer 请求头中发送，绝不放进 URL。接口返回当前密钥的有限近期记录，本地每页显示 20 条，不假装支持完整历史分页。只展示消费和失败请求，排除充值、退款、管理等事件。老分支或站点若不支持 Bearer 查询则报告不兼容。
+- Sub2API 普通套餐 Key 目前只能读取 `/v1/usage` 额度，用户日志 `/api/v1/usage` 要求后台 JWT；不会用普通 Key 尝试管理员或用户 JWT 接口。其他接入方式尚未接入逐次日志。
+- Sub2API 优先显示 `actual_cost`，只有 `total_cost` 时标记“标准价”。New API 沿用站点公开货币换算规则。缺失数值显示 `—`，真实 0 保留，费用最多六位小数；正数低于最小显示精度时显示 `<$0.000001`。
+- `first_token_ms` / New API `other.frt` 为毫秒，Sub2API `duration_ms` 为毫秒，New API `use_time` 为秒。缺失时不推测吞吐率或延迟。
+- 记录按需读取，支持手动刷新，会话续期与额度查询共用，重连后拒绝旧请求的结果。只保留模型、时间、扣费和用量字段，详情关闭即释放，不写入本机额度缓存、小组件或配置导出。
+
+Windows 自建站的手机访问方式见 [手机连接本地 Sub2API](LOCAL_SUB2API.md)。
+
 ## 文件结构
 
 - `mobile/src/providers/`：请求、识别、适配器、额度解析。

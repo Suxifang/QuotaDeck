@@ -1,4 +1,4 @@
-import type { QuotaSnapshot, SavedData, Source } from '../domain/types';
+import type { QuotaSnapshot, SavedData, Source, UsagePage, UsageRecord } from '../domain/types';
 import { DEFAULT_PREFERENCES } from '../domain/types';
 
 /** Explicit, opt-in sample data. Never sent to a network endpoint or mixed with saved accounts. */
@@ -28,4 +28,22 @@ export function createDemo(): SavedData {
       remaining: (metric.remaining ?? 0) + (6 - day) * (index === 0 ? 0.8 : index === 1 ? 2 : 1.1), used: metric.used })) };
   })]));
   return { version: 1, sources, states: Object.fromEntries(snapshots.map(snapshot => [snapshot.sourceId, { snapshot }])), history, preferences: { ...DEFAULT_PREFERENCES } };
+}
+
+export function createDemoUsage(sourceId: string, page: number): UsagePage {
+  const now = new Date().toISOString();
+  const records: UsageRecord[] = Array.from({ length: 46 }, (_, index) => ({
+    id: `demo-usage-${sourceId}-${index}`,
+    model: index % 4 === 3 ? 'claude-sonnet-4.5' : 'gpt-5',
+    createdAt: new Date(Date.now() - (index * 19 + 2) * 60_000).toISOString(),
+    cost: { value: [.034814, .021742, .000028, .023088, .030894][index % 5], unit: 'USD', kind: 'actual' },
+    inputTokens: 1410 + index * 87, outputTokens: 2114 - index * 23,
+    cacheReadTokens: 108500 + index * 2130, cacheWriteTokens: index % 3 === 0 ? 0 : 1400,
+    firstTokenMs: 2720 + index * 130, durationMs: 66200 - index * 431,
+    reasoningEffort: index % 4 === 3 ? undefined : 'high', stream: true,
+  }));
+  const recentOnly = sourceId === 'demo-new';
+  return { records: recentOnly ? records : records.slice((page - 1) * 20, page * 20), page,
+    ...(!recentOnly && page < 3 ? { nextPage: page + 1 } : {}), recentOnly, fetchedAt: now,
+    notice: '界面示例；真实记录的可用范围取决于站点接口与权限。' };
 }

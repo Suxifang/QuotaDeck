@@ -94,7 +94,7 @@ export function Deck({ controller, tab }: { controller: QuotaController; tab: Ta
     </ScrollView>
     {showUpdates ? <Sheet visible title="软件更新" onClose={() => setShowUpdates(false)}><UpdateSettings /></Sheet> : null}
     {connection ? <ConnectionSheet controller={controller} existing={connection.existing} onClose={() => setConnection(undefined)} /> : null}
-    {detail && !connection ? <DetailSheet source={detail} controller={controller} onClose={closeDetail} onReconnect={source => { closeDetail(); setConnection({ existing: source }); }} /> : null}
+    {detail && !connection ? <DetailSheet key={detail.id} source={detail} controller={controller} onClose={closeDetail} onReconnect={source => { closeDetail(); setConnection({ existing: source }); }} /> : null}
   </View>;
 }
 

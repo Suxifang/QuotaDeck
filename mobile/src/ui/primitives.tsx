@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { AccessibilityInfo, ActivityIndicator, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { AccessibilityInfo, ActivityIndicator, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type ScrollViewInstance, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { GlassView, isLiquidGlassAvailable, isGlassEffectAPIAvailable } from 'expo-glass-effect';
 import * as Haptics from 'expo-haptics';
@@ -93,8 +93,10 @@ export function Field({ label, hint, hideLabel = false, ...input }: TextInputPro
   </View>;
 }
 
-export function Sheet({ visible, title, subtitle, onClose, children }: React.PropsWithChildren<{ visible: boolean; title: string; subtitle?: string; onClose: () => void }>) {
+export function Sheet({ visible, title, subtitle, onClose, scrollKey, children }: React.PropsWithChildren<{ visible: boolean; title: string; subtitle?: string; onClose: () => void; scrollKey?: string }>) {
   const t = useTheme(); const insets = useSafeAreaInsets();
+  const scroll = useRef<ScrollViewInstance>(null);
+  useEffect(() => { scroll.current?.scrollTo({ y: 0, animated: false }); }, [scrollKey]);
   return <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
     <View style={{ flex: 1, backgroundColor: t.dark ? 'rgba(3,15,9,0.65)' : 'rgba(39,65,56,0.22)', justifyContent: 'flex-end' }}>
       <Pressable accessibilityLabel="关闭面板" onPress={onClose} style={StyleSheet.absoluteFill} />
@@ -106,7 +108,7 @@ export function Sheet({ visible, title, subtitle, onClose, children }: React.Pro
               {subtitle ? <Text numberOfLines={2} style={{ fontSize: 12, color: t.secondary, marginTop: 5 }}>{subtitle}</Text> : null}</View>
             <IconButton icon={X} label="关闭" onPress={onClose} size={36} />
           </View>
-          <ScrollView style={{ flexShrink: 1 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: Math.max(insets.bottom, 24) + 12, gap: 20 }}>
+          <ScrollView ref={scroll} style={{ flexShrink: 1 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: Math.max(insets.bottom, 24) + 12, gap: 20 }}>
             {children}
           </ScrollView>
         </View>

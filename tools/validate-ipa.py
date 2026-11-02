@@ -9,7 +9,7 @@ import zipfile
 from ipa_entitlements import read_entitlements
 
 
-def validate_ipa(path, version, build):
+def validate_ipa(path, version, build, *, app_group='group.app.quotadeck.mobile'):
     path = Path(path)
     with zipfile.ZipFile(path) as package:
         if package.testzip() is not None:
@@ -38,7 +38,7 @@ def validate_ipa(path, version, build):
         executable = widgets[0].removesuffix('Info.plist') + widget['CFBundleExecutable']
         if executable not in names or not package.getinfo(executable).file_size:
             raise RuntimeError('Widget executable is missing')
-        group = 'group.app.quotadeck.mobile'
+        group = app_group
         for label, target, program in [('Application', info, app + info['CFBundleExecutable']), ('Widget', widget, executable)]:
             if target.get('ExpoWidgetsAppGroupIdentifier') != group:
                 raise RuntimeError(f'{label} shared group Info.plist is missing or changed')

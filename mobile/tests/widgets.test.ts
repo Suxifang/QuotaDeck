@@ -44,6 +44,30 @@ describe('widget snapshots and future timelines', () => {
     expect(timeline.at(-1)!.props.accounts[0].metrics[0]).toMatchObject({ value: '$12.00', stale: true });
     expect(timeline.at(-1)!.date.getTime()).toBe(now + 15 * 60_000);
   });
+  it('omits unknown percentages so native property-list storage can accept balance and unlimited accounts', () => {
+    const saved = data();
+    saved.states[source.id].snapshot!.metrics = [
+      { id: 'balance', label: '余额', remaining: 12, unit: 'USD', scope: 'account' },
+      { id: 'unlimited', label: '不限额', unlimited: true, unit: 'requests', scope: 'account' },
+      { id: 'invalid', label: '无效采样', remaining: NaN, unit: '%', scope: 'account' },
+      { id: 'zero', label: '已用尽', remaining: 0, unit: '%', scope: 'account' },
+    ];
+    for (const entry of widgetTimeline(saved, now)) {
+      const metrics = entry.props.accounts[0].metrics;
+      for (const metric of metrics.slice(0, 3)) expect(metric).not.toHaveProperty('percent');
+      expect(metrics[3].percent).toBe(0);
+      expect(metrics[0].value).toBe('$12.00');
+      expect(metrics[1].value).toBe('不限额');
+      const assertPropertyList = (value: unknown): void => {
+        if (typeof value === 'number') { expect(Number.isFinite(value)).toBe(true); return; }
+        if (typeof value === 'string' || typeof value === 'boolean') return;
+        expect(value).not.toBeNull();
+        expect(typeof value).toBe('object');
+        for (const item of Object.values(value as object)) assertPropertyList(item);
+      };
+      assertPropertyList(entry.props);
+    }
+  });
   it('handles an empty setup and invalid or excessive timestamps without an invalid timeline', () => {
     const saved = data();
     saved.states[source.id].snapshot!.fetchedAt = 'invalid';

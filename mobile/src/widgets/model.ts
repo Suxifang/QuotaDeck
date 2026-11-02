@@ -5,7 +5,7 @@ export interface WidgetMetric {
   id: string;
   label: string;
   value: string;
-  percent: number | null;
+  percent?: number;
   resetText: string;
   stale: boolean;
 }
@@ -38,13 +38,17 @@ export function widgetData(data: SavedData, now = Date.now()): WidgetData {
       const snapshot = state?.snapshot;
       const fetched = timestamp(snapshot?.fetchedAt);
       const old = !validDate(fetched) || now - fetched >= 15 * 60_000 || fetched > now + 5 * 60_000;
-      const metrics = (snapshot?.metrics ?? []).map(metric => ({
-        id: metric.id, label: metric.label,
-        value: metric.unlimited ? '不限额' : amount(metric.remaining, metric.unit, true),
-        percent: percentRemaining(metric) ?? null,
-        resetText: metric.resetAt ? `${metric.resetEstimated ? '预计 ' : ''}${countdown(metric.resetAt, now)}` : '',
-        stale: old || !!state?.error || isSampleStale(metric, now),
-      }));
+      const metrics = (snapshot?.metrics ?? []).map(metric => {
+        const percent = percentRemaining(metric);
+        return {
+          id: metric.id, label: metric.label,
+          value: metric.unlimited ? '不限额' : amount(metric.remaining, metric.unit, true),
+          // Expo writes props directly to UserDefaults; absent values must be omitted.
+          ...(percent !== undefined && Number.isFinite(percent) ? { percent } : {}),
+          resetText: metric.resetAt ? `${metric.resetEstimated ? '预计 ' : ''}${countdown(metric.resetAt, now)}` : '',
+          stale: old || !!state?.error || isSampleStale(metric, now),
+        };
+      });
       const updatedLabel = validDate(fetched) ? new Intl.DateTimeFormat('zh-CN', {
         month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false,
       }).format(new Date(fetched)) : '尚未更新';

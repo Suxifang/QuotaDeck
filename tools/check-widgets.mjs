@@ -24,10 +24,10 @@ for (const [script, args] of [
 const runtime = readFileSync(runtimePath, 'utf8');
 const registry = JSON.parse(readFileSync(registryPath, 'utf8'));
 const account = (id, value, percent) => ({ id, name: `账号 ${id}`, provider: 'Sub2API', metrics: [
-  { id: '5h', label: '五小时额度', value, percent, stale: false, resetText: '2 小时后重置' },
+  { id: '5h', label: '五小时额度', value, ...(percent === undefined ? {} : { percent }), stale: false, resetText: '2 小时后重置' },
   { id: '7d', label: '七天额度', value: '16%', percent: 16, stale: false, resetText: '' },
 ], status: '上次查询', updatedLabel: '11/02 11:00', url: `quotadeck:///?sourceId=${id}` });
-const filled = { accounts: [account('one', '$594.57', 99), account('two', '0%', 0), account('three', '不限额', null)], focusId: '', threshold: 20 };
+const filled = { accounts: [account('one', '$594.57', 99), account('two', '0%', 0), account('three', '不限额')], focusId: '', threshold: 20 };
 let count = 0;
 for (const widget of widgets) {
   const context = vm.createContext({ console });

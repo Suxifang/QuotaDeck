@@ -34,7 +34,6 @@ export function WidgetSettings({ controller }: { controller: QuotaController }) 
       {Platform.OS === 'ios' ? <>
         <Button title={controller.widgetSyncing ? '正在同步…' : '立即同步到小组件'} icon={RefreshCw} loading={controller.widgetSyncing} disabled={!controller.ready} onPress={() => void controller.publishWidgets(true)} />
         {controller.widgetError ? <Text accessibilityRole="alert" style={{ color: t.amber, fontSize: 12, lineHeight: 21 }}>{controller.widgetError}</Text> : sync?.supported ? <Text accessibilityLiveRegion="polite" style={{ color: t.secondary, fontSize: 11, lineHeight: 20 }}>已写入 {sync.accountCount} 个账号 · {new Date(sync.syncedAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}。桌面显示由系统刷新，可能稍有延迟。</Text> : null}
-        {controller.widgetError ? <Text style={{ color: t.muted, fontSize: 11, lineHeight: 20 }}>签名时保留小组件扩展和相同的 App Group，证书也须允许该共享组。仅在应用里置顶或反复同步，无法补上签名权限。</Text> : null}
       </> : <Text style={{ color: t.muted, fontSize: 11 }}>桌面同步需要在已安装的 iPhone 应用内操作。</Text>}
     </Glass>
     <Pressable accessibilityRole="button" accessibilityLabel="预览小组件外观" accessibilityState={{ expanded: showPreview }} onPress={() => setShowPreview(value => !value)} style={[styles.between, { paddingVertical: 8 }]}>

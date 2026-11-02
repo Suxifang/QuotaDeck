@@ -50,6 +50,8 @@ jobs:
           cache-dependency-path: mobile/package-lock.json
       - name: Install dependencies
         run: npm ci --prefix mobile
+      - name: Check native widget storage
+        run: node mobile/node_modules/tsx/dist/cli.mjs tools/check-widget-storage.ts
       - name: Generate iOS project
         working-directory: mobile
         run: npx expo prebuild --platform ios --no-install

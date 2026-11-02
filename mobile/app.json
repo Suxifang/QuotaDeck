@@ -2,14 +2,14 @@
   "expo": {
     "name": "Yudu",
     "slug": "yudu",
-    "version": "0.2.3",
+    "version": "0.2.4",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "app.quotadeck.mobile",
-      "buildNumber": "5",
+      "buildNumber": "6",
       "infoPlist": {
         "CFBundleDisplayName": "余度",
         "CADisableMinimumFrameDurationOnPhone": true,

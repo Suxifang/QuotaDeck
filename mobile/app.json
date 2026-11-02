@@ -35,7 +35,37 @@
     "plugins": [
       "expo-secure-store",
       "expo-sharing",
-      "expo-router"
+      "expo-router",
+      ["expo-widgets", {
+        "bundleIdentifier": "app.quotadeck.mobile.widgets",
+        "groupIdentifier": "group.app.quotadeck.mobile",
+        "widgets": [
+          {
+            "name": "QuotaFocus",
+            "displayName": "余量 · 关注账号",
+            "description": "查看一个常用账号的余量，也可放在锁屏。点击进入额度详情。",
+            "ios": {
+              "supportedFamilies": ["systemSmall", "accessoryRectangular"],
+              "initialLayout": "src/widgets/FocusWidget.ios.tsx",
+              "configuration": {
+                "title": "关注哪个账号",
+                "parameters": {
+                  "account": { "title": "账号", "type": "enum", "default": "automatic", "dynamic": true, "values": [{ "name": "跟随应用选择", "value": "automatic" }] }
+                }
+              }
+            }
+          },
+          {
+            "name": "QuotaOverview",
+            "displayName": "余量 · 常用账号",
+            "description": "一起查看最多三个账号，置顶账号优先显示。",
+            "ios": {
+              "supportedFamilies": ["systemMedium"],
+              "initialLayout": "src/widgets/OverviewWidget.ios.tsx"
+            }
+          }
+        ]
+      }]
     ],
     "scheme": "quotadeck"
   }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowRight, ChevronRight, FlaskConical, LayoutGrid, Link2, Plus, RefreshCw, Settings2, ShieldCheck } from 'lucide-react-native';
 import { PROVIDER_LABELS, type Source } from '../domain/types';
@@ -19,13 +19,15 @@ type Tab = 'overview' | 'connections' | 'settings';
 export function Deck({ controller, tab }: { controller: QuotaController; tab: Tab }) {
   const t = useTheme(); const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { sourceId } = useLocalSearchParams<{ sourceId?: string }>();
   const [connection, setConnection] = useState<{ existing?: Source }>();
   const [detailId, setDetailId] = useState<string>();
   const [filter, setFilter] = useState<'all' | 'pinned'>('all');
   const [refreshing, setRefreshing] = useState(false);
   const data = controller.data;
+  const closeDetail = () => { setDetailId(undefined); if (sourceId) router.setParams({ sourceId: undefined }); };
   const sources = [...data.sources].sort((a, b) => Number(b.pinned) - Number(a.pinned));
-  const detail = sources.find(source => source.id === detailId);
+  const detail = sources.find(source => source.id === (detailId ?? (controller.isDemo ? undefined : sourceId)));
   const healthy = sources.filter(source => source.enabled && data.states[source.id]?.snapshot && !data.states[source.id]?.error && !attention(data.states[source.id]?.snapshot, data.preferences.lowThreshold) && !data.states[source.id]?.snapshot?.metrics.some(metric => isSampleStale(metric))).length;
   const needsAttention = sources.filter(source => source.enabled && (data.states[source.id]?.error || data.states[source.id]?.snapshot?.metrics.some(metric => isSampleStale(metric)) || attention(data.states[source.id]?.snapshot, data.preferences.lowThreshold))).length;
   const add = () => { tap(data.preferences.haptics); setConnection({}); };
@@ -34,7 +36,7 @@ export function Deck({ controller, tab }: { controller: QuotaController; tab: Ta
   const chooseTab = (value: Tab) => { tap(data.preferences.haptics); router.replace(value === 'overview' ? '/' : value === 'connections' ? '/connections' : '/settings'); };
 
   return <LinearGradient colors={t.backdrop} style={{ flex: 1 }}>
-    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+    <View pointerEvents="none" style={[StyleSheet.absoluteFill, { overflow: 'hidden' }]}>
       <View style={{ position: 'absolute', top: 40, right: -140, width: 330, height: 330, borderRadius: 200, backgroundColor: t.dark ? '#1F4E7040' : '#B6DAFC35' }} />
       <View style={{ position: 'absolute', top: 410, left: -180, width: 320, height: 320, borderRadius: 200, backgroundColor: t.dark ? '#19554C22' : '#CBE9DC33' }} />
     </View>
@@ -99,7 +101,7 @@ export function Deck({ controller, tab }: { controller: QuotaController; tab: Ta
       </Glass>
     </View>
     {connection ? <ConnectionSheet controller={controller} existing={connection.existing} onClose={() => setConnection(undefined)} /> : null}
-    {detail && !connection ? <DetailSheet source={detail} controller={controller} onClose={() => setDetailId(undefined)} onReconnect={source => { setDetailId(undefined); setConnection({ existing: source }); }} /> : null}
+    {detail && !connection ? <DetailSheet source={detail} controller={controller} onClose={closeDetail} onReconnect={source => { closeDetail(); setConnection({ existing: source }); }} /> : null}
   </LinearGradient>;
 }
 

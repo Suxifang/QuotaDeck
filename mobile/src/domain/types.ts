@@ -80,6 +80,7 @@ export interface Preferences {
   refreshSeconds: 30 | 60 | 120 | 300;
   lowThreshold: number;
   haptics: boolean;
+  widgetSourceId?: string;
 }
 
 export interface SavedData {

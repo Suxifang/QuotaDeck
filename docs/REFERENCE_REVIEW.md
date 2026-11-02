@@ -13,6 +13,7 @@
 | blueskycrb/sub2api-ios | SwiftUI 用户端、2FA、GitHub iOS 构建 | 未见标准许可证；阅读比较，未复制 |
 | mcxiaochenn/AiUsage | Flutter 本地监控、多币种、演示和缓存 | MIT；阅读比较，未复制 |
 | bejix/upstream-ops | 多站管理功能范围 | 未见明确 LICENSE；未复制 |
+| expo/expo · expo-widgets、@expo/ui | SDK 58 官方小组件、SwiftUI 组件、独立运行时与配置插件 | 直接依赖 MIT 软件包 58.0.26，使用官方扩展生成与时间线机制 |
 
 实际复用版本：
 
@@ -21,3 +22,5 @@
 - sub2api-dashboard: `b8824f0f9427d3085a6fd96bb7f612e5869d8a7c`
 
 改进：统一数据记录、单个账号独立刷新、查询时间与采样时间分开、超时和错误分类、站点内请求约束、先检查公共响应再发送凭据、原生液态玻璃与无障碍回退、手机安全存储。没有复制上游响应中的 credentials 或任意 extra 数据到缓存。
+
+小组件通过官方 config plugin 生成独立 iOS 扩展，不手动维护生成的 Xcode 工程。小号与锁屏支持单独选择账号，中号显示最多三个账号。只向共享空间投影显示名称、数值、采样状态和应用内跳转，不共享原始响应、站点地址或凭据。未来时间线仅使旧额度进入待更新状态，不预测重置后余额。应用关闭后暂不主动抓取；桌面外观及 App Group 自签兼容性须由真实 iPhone 确认。

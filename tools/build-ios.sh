@@ -14,6 +14,7 @@ xcodebuild \
 app='.cache/ios-build/Build/Products/Release-iphoneos/QuotaDeck.app'
 test -d "$app"
 test -f "$app/main.jsbundle"
+test -f "$app/PlugIns/ExpoWidgetsTarget.appex/ExpoWidgetsTarget"
 mkdir -p artifacts/ipa/Payload
 ditto "$app" artifacts/ipa/Payload/QuotaDeck.app
 (cd artifacts/ipa && zip -qry ../QuotaDeck-unsigned.ipa Payload)

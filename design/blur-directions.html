@@ -1,0 +1,148 @@
+<style>
+#quota-directions { --qd-ui: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", "Microsoft YaHei", sans-serif; }
+#quota-directions .qd-stage { min-height: 814px; display: flex; justify-content: center; align-items: flex-start; padding: 24px 0 30px; box-sizing: border-box; }
+#quota-directions .qd-phone { width: min(375px, 100%); height: 756px; box-sizing: border-box; border: 7px solid light-dark(#27333b, #273138); border-radius: 48px; box-shadow: 0 20px 45px light-dark(#102b4321, #00000045); position: relative; overflow: hidden; font-family: var(--qd-ui); color: var(--qd-ink); font-size: 13px; line-height: 1.4; color-scheme: light dark; --qd-radius: 22px; --qd-blur: 28px; --qd-ink: light-dark(#18363c, #f0f5f1); --qd-sub: light-dark(#466269, #b5c9c4); --qd-muted: light-dark(#587579, #a3b8af); --qd-line: light-dark(#264f5321, #e9f6ed21); --qd-track: light-dark(#2d695524, #e5f2e026); --qd-accent: light-dark(#256d5e, #b8dac1); --qd-surface: light-dark(#f6fffa64, #e7f8ec0a); --qd-border: light-dark(#ffffff96, #ffffff20); --qd-dock: light-dark(#f4fff3aa, #11211ad6); }
+#quota-directions .qd-ambient { position: absolute; inset: -40px; background: radial-gradient(ellipse at 15% 9%, light-dark(#b9d7e1, #4c696d), transparent 64%), radial-gradient(ellipse at 92% 61%, light-dark(#9cae79, #4e6540), transparent 63%), linear-gradient(155deg, light-dark(#d5e5e5, #34484d), light-dark(#c7cfae, #293b29)); filter: blur(24px); }
+#quota-directions .qd-content { position: relative; padding: 17px 20px 90px; height: 100%; box-sizing: border-box; }
+#quota-directions .qd-status { display: flex; justify-content: space-between; align-items: center; height: 23px; padding: 0 10px; font-size: 13px; font-weight: 600; }
+#quota-directions .qd-island { position: absolute; width: 94px; height: 24px; border-radius: 16px; background: #152021; left: 50%; top: 12px; transform: translateX(-50%); }
+#quota-directions .qd-header { display: flex; justify-content: space-between; align-items: center; padding: 25px 1px 0; }
+#quota-directions .qd-name { font-size: 23px; letter-spacing: 1px; font-weight: 600; }
+#quota-directions .qd-wordmark { font-size: 9px; letter-spacing: 1.3px; padding-left: 9px; opacity: .6; }
+#quota-directions .qd-header-actions { display: flex; gap: 8px; }
+#quota-directions button { font: inherit; color: inherit; -webkit-tap-highlight-color: transparent; }
+#quota-directions .qd-icon-button { border: 1px solid var(--qd-border); background: var(--qd-surface); backdrop-filter: blur(var(--qd-blur)); width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; padding: 0; }
+#quota-directions .qd-icon-button svg { width: 16px; height: 16px; }
+#quota-directions .qd-hero { margin-top: 28px; }
+#quota-directions .qd-eyebrow { font-size: 9px; letter-spacing: 1.3px; color: var(--qd-sub); }
+#quota-directions .qd-headline { font-size: 28px; font-weight: 600; letter-spacing: -.9px; margin: 11px 0 6px; }
+#quota-directions .qd-subtitle { font-size: 11px; color: var(--qd-sub); }
+#quota-directions .qd-summary { display: flex; align-items: center; gap: 0; margin-top: 22px; padding: 16px 0; border-top: 1px solid var(--qd-line); border-bottom: 1px solid var(--qd-line); }
+#quota-directions .qd-stat { flex: 1; display: flex; align-items: center; flex-direction: column; gap: 4px; }
+#quota-directions .qd-stat + .qd-stat { border-left: 1px solid var(--qd-line); }
+#quota-directions .qd-stat strong { font-size: 22px; font-weight: 500; font-variant-numeric: tabular-nums; }
+#quota-directions .qd-stat span { color: var(--qd-sub); font-size: 9px; }
+#quota-directions .qd-list-title { display: flex; justify-content: space-between; align-items: center; margin: 22px 1px 12px; font-size: 11px; font-weight: 600; }
+#quota-directions .qd-list-title small { font-size: 9px; color: var(--qd-sub); font-weight: 400; }
+#quota-directions .qd-source { width: 100%; text-align: left; border-radius: var(--qd-radius); border: 1px solid var(--qd-border); padding: 17px; box-sizing: border-box; background: var(--qd-surface); backdrop-filter: blur(var(--qd-blur)) saturate(120%); -webkit-backdrop-filter: blur(var(--qd-blur)) saturate(120%); box-shadow: 0 9px 25px #243e2e09; display: block; }
+#quota-directions .qd-source + .qd-source { margin-top: 12px; }
+#quota-directions .qd-source-header { display: flex; gap: 9px; align-items: center; }
+#quota-directions .qd-provider-icon { width: 31px; height: 31px; display: grid; place-items: center; border-radius: 9px; background: light-dark(#edfff47d, #e6f9e71c); color: var(--qd-accent); }
+#quota-directions .qd-provider-icon svg { width: 17px; height: 17px; }
+#quota-directions .qd-provider-name { flex: 1; font-size: 12px; font-weight: 600; }
+#quota-directions .qd-provider-name small { display: block; margin-top: 2px; font-size: 9px; color: var(--qd-sub); font-weight: 400; }
+#quota-directions .qd-detail-hint { display: flex; align-items: center; gap: 2px; color: var(--qd-sub); font-size: 9px; }
+#quota-directions .qd-detail-hint svg { width: 12px; height: 12px; }
+#quota-directions .qd-amount-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; margin-top: 17px; }
+#quota-directions .qd-metric-label { font-size: 10px; color: var(--qd-sub); }
+#quota-directions .qd-amount { font-size: 37px; line-height: 1.2; letter-spacing: -1.8px; font-weight: 500; font-variant-numeric: tabular-nums; margin-top: 5px; }
+#quota-directions .qd-cost { text-align: right; padding-bottom: 4px; }
+#quota-directions .qd-cost b { display: block; margin-top: 6px; font-size: 13px; font-weight: 500; }
+#quota-directions .qd-meter { height: 4px; background: var(--qd-track); border-radius: 3px; margin-top: 11px; overflow: hidden; }
+#quota-directions .qd-meter span { height: 100%; display: block; width: 82%; border-radius: inherit; background: var(--qd-accent); }
+#quota-directions .qd-meta { display: flex; justify-content: space-between; margin-top: 13px; font-size: 9px; color: var(--qd-sub); }
+#quota-directions .qd-compact .qd-amount-row { margin-top: 12px; }
+#quota-directions .qd-compact .qd-amount { font-size: 27px; }
+#quota-directions .qd-pill { background: light-dark(#fff5db9e, #725c2b75); color: light-dark(#7b5a1d, #f6da95); border-radius: 6px; padding: 4px 6px; font-size: 9px; }
+#quota-directions .qd-dock { position: absolute; left: 18px; right: 18px; bottom: 21px; display: flex; padding: 5px; border-radius: 25px; border: 1px solid var(--qd-border); background: var(--qd-dock); backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px); box-shadow: 0 5px 25px #14281c10; }
+#quota-directions .qd-nav { flex: 1; border: 0; border-radius: 20px; padding: 8px 0; background: transparent; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--qd-sub); font-size: 9px; }
+#quota-directions .qd-nav svg { width: 18px; height: 18px; }
+#quota-directions .qd-nav[aria-selected="true"] { background: light-dark(#ffffff90, #e2f2df20); color: var(--qd-ink); }
+#quota-directions .qd-home-indicator { position: absolute; width: 105px; height: 4px; bottom: 7px; left: calc(50% - 52px); background: var(--qd-ink); opacity: .7; border-radius: 4px; }
+#quota-directions .qd-native { --qd-ink: light-dark(#142d46, #e8f1fc); --qd-sub: light-dark(#65788c, #a9bfd7); --qd-accent: light-dark(#397fe5, #87b3ff); --qd-muted: light-dark(#64798f, #9dafc4); --qd-surface: light-dark(#ffffffb8, #1d334bc2); --qd-border: light-dark(#ffffffdb, #c9e0fc27); --qd-line: light-dark(#31547717, #c9e0fc22); --qd-track: light-dark(#e0e9f3, #3d526b); --qd-dock: light-dark(#ffffffcf, #1b304ade); }
+#quota-directions .qd-native .qd-ambient { background: radial-gradient(ellipse at 100% 18%, light-dark(#b7d8fb99, #2d52744d), transparent 53%), radial-gradient(ellipse at 0% 80%, light-dark(#d9ede29c, #2a69583d), transparent 52%), light-dark(#f0f5fc, #112337); }
+#quota-directions .qd-native .qd-summary { background: var(--qd-surface); border: 1px solid var(--qd-border); border-radius: var(--qd-radius); }
+#quota-directions .qd-native .qd-provider-icon { background: light-dark(#e9f1ff, #2a4567); }
+#quota-directions .qd-minimal { --qd-surface: light-dark(#ffffff32, #c7d6dc08); --qd-border: light-dark(#ffffff70, #edf4fb1f); --qd-ink: light-dark(#293d4c, #eef3f9); --qd-sub: light-dark(#5a6e7b, #b0bfcc); --qd-accent: light-dark(#4d718f, #acc9df); --qd-line: light-dark(#354b6126, #d8e6f220); --qd-dock: light-dark(#eff4f7b8, #192733d9); }
+#quota-directions .qd-minimal .qd-ambient { background: radial-gradient(ellipse at 90% 20%, light-dark(#b7cdda, #3f5667), transparent 64%), radial-gradient(ellipse at 0% 95%, light-dark(#dbcec2, #4c4b48), transparent 65%), light-dark(#dce5e9, #26313b); }
+#quota-directions .qd-minimal .qd-hero { margin-top: 35px; }
+#quota-directions .qd-minimal .qd-summary { margin-top: 19px; }
+#quota-directions .qd-minimal .qd-source { border: 0; border-bottom: 1px solid var(--qd-line); background: transparent; box-shadow: none; border-radius: 0; padding: 19px 1px; backdrop-filter: none; }
+#quota-directions .qd-minimal .qd-source + .qd-source { margin-top: 0; }
+#quota-directions .qd-minimal .qd-source-header .qd-provider-icon { display: none; }
+#quota-directions .qd-minimal .qd-amount { font-size: 43px; }
+#quota-directions .qd-minimal .qd-compact .qd-amount { font-size: 29px; }
+#quota-directions .qd-overlay { position: absolute; inset: 0; z-index: 8; background: light-dark(#35504b25, #09171250); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: flex-end; padding: 9px; box-sizing: border-box; }
+#quota-directions .qd-overlay[hidden] { display: none; }
+#quota-directions .qd-sheet { width: 100%; border-radius: 27px 27px 32px 32px; background: light-dark(#edf5f1, #23382e); padding: 22px 19px 28px; box-sizing: border-box; box-shadow: 0 -10px 50px #0c201d20; }
+#quota-directions .qd-sheet-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 21px; font-size: 21px; font-weight: 600; }
+#quota-directions .qd-tabs { display: flex; background: light-dark(#d5e3de, #182d24); border-radius: 12px; padding: 3px; margin-bottom: 22px; }
+#quota-directions .qd-tabs button { flex: 1; font-size: 10px; border: 0; background: transparent; padding: 9px 0; border-radius: 9px; }
+#quota-directions .qd-tabs button[aria-selected="true"] { background: light-dark(#f9fffc, #466052); }
+#quota-directions .qd-sheet-number { font-size: 42px; font-weight: 500; letter-spacing: -1.5px; margin: 6px 0 14px; }
+#quota-directions .qd-sheet-record { display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--qd-line); font-size: 12px; }
+#quota-directions .qd-placeholder-page { padding: 24px 0; }
+#quota-directions .qd-placeholder-page h3 { font-size: 25px; font-weight: 600; margin: 0 0 20px; }
+#quota-directions .qd-placeholder-row { padding: 20px 0; border-bottom: 1px solid var(--qd-line); display: flex; justify-content: space-between; font-size: 13px; }
+@media(max-width: 360px) { #quota-directions .qd-content { padding-left: 16px; padding-right: 16px; } #quota-directions .qd-stage { padding-top: 15px; } #quota-directions .qd-wordmark { display: none; } }
+</style>
+<div id="quota-directions" aria-label="额度应用界面风格与名称预排">
+  <div class="viz-carousel viz-dotted-background" aria-label="界面风格对比" data-previous-label="上一款" data-next-label="下一款">
+    <section data-variant="通透磨砂" aria-label="通透磨砂界面"><div class="qd-stage"><div class="qd-phone qd-frost" aria-label="通透磨砂预览"></div></div></section>
+    <section data-variant="轻玻璃卡片" aria-label="轻玻璃卡片界面" hidden><div class="qd-stage"><div class="qd-phone qd-native" aria-label="轻玻璃卡片预览"></div></div></section>
+    <section data-variant="极简清单" aria-label="极简清单界面" hidden><div class="qd-stage"><div class="qd-phone qd-minimal" aria-label="极简清单预览"></div></div></section>
+  </div>
+</div>
+<script>
+(() => {
+  const root = document.getElementById('quota-directions');
+  const saved = window.openai?.widgetState;
+  const names = ['余度', '余见', '有余'];
+  const state = { name: names.includes(saved?.modelContent?.name) ? saved.modelContent.name : '余度', appearance: saved?.privateContent?.appearance || '跟随系统' };
+  const settings = new Map();
+  const icon = name => `<i data-lucide="${name}" aria-hidden="true"></i>`;
+  function shell() {
+    return `<div class="qd-ambient"></div><div class="qd-content"><div class="qd-status"><span>9:41</span><span>▮▮▮  Wi-Fi  ▰</span></div><div class="qd-header"><div><span class="qd-name">${state.name}</span><span class="qd-wordmark">QUOTA</span></div><div class="qd-header-actions"><button type="button" class="qd-icon-button cursor-interaction" data-action="refresh" aria-label="刷新预览">${icon('refresh-cw')}</button><button type="button" class="qd-icon-button cursor-interaction" data-action="connections" aria-label="添加连接">${icon('plus')}</button></div></div><div class="qd-main"></div><div class="qd-dock"><button type="button" class="qd-nav cursor-interaction" data-page="overview" aria-selected="true">${icon('layout-grid')}总览</button><button type="button" class="qd-nav cursor-interaction" data-page="connections" aria-selected="false">${icon('link-2')}连接</button><button type="button" class="qd-nav cursor-interaction" data-page="settings" aria-selected="false">${icon('sliders-horizontal')}设置</button></div></div><div class="qd-island"></div><div class="qd-home-indicator"></div><div class="qd-overlay" hidden><div class="qd-sheet"><div class="qd-sheet-title"><span>Pro 工作站</span><button type="button" class="qd-icon-button cursor-interaction" data-action="close" aria-label="关闭详情">${icon('x')}</button></div><div class="qd-tabs"><button type="button" class="cursor-interaction" data-detail="overview" aria-selected="true">额度概览</button><button type="button" class="cursor-interaction" data-detail="history" aria-selected="false">余量记录</button><button type="button" class="cursor-interaction" data-detail="manage" aria-selected="false">连接管理</button></div><div class="qd-sheet-body" aria-live="polite"></div></div></div>`;
+  }
+  const overview = `<div class="qd-hero"><div class="qd-eyebrow">11月2日 星期一 · 概览</div><div class="qd-headline">用量，一目了然。</div><div class="qd-subtitle">常用的 API 额度，都在这里。</div></div><div class="qd-summary"><div class="qd-stat"><strong>03</strong><span>监控账号</span></div><div class="qd-stat"><strong>02</strong><span>状态正常</span></div><div class="qd-stat"><strong>01</strong><span>需要留意</span></div></div><div class="qd-list-title"><span>全部额度 <span style="opacity:.55"> 3</span></span><small>● 刚刚更新 · 演示数据</small></div><button type="button" class="qd-source cursor-interaction" data-action="detail" aria-label="查看 Pro 工作站详情"><div class="qd-source-header"><span class="qd-provider-icon">${icon('layers-2')}</span><span class="qd-provider-name">Pro 工作站<small>Sub2API 套餐</small></span><span class="qd-detail-hint">详情 ${icon('chevron-right')}</span></div><div class="qd-amount-row"><div><div class="qd-metric-label">每周额度 · 剩余</div><div class="qd-amount">$594.57</div></div><div class="qd-cost"><span class="qd-metric-label">今日消耗</span><b>$5.43</b></div></div><div class="qd-meter"><span style="width:99%"></span></div><div class="qd-meta"><span>总额度 $600.00</span><span>3 天后重置</span></div></button><button type="button" class="qd-source qd-compact cursor-interaction" data-action="detail" aria-label="查看私人反代详情"><div class="qd-source-header"><span class="qd-provider-icon">${icon('network')}</span><span class="qd-provider-name">私人反代<small>Sub2API · Codex</small></span><span class="qd-detail-hint">详情 ${icon('chevron-right')}</span></div><div class="qd-amount-row"><div><div class="qd-metric-label">五小时额度 · 剩余</div><div class="qd-amount">82%</div></div><span class="qd-pill">七天剩余 16%</span></div><div class="qd-meter"><span></span></div><div class="qd-meta"><span>2 小时 40 分后重置</span><span>刚刚</span></div></button>`;
+  function detail(phone, tab) {
+    phone.querySelectorAll('[data-detail]').forEach(button => button.setAttribute('aria-selected', String(button.dataset.detail === tab)));
+    phone.querySelector('.qd-sheet-body').innerHTML = tab === 'overview' ? `<div class="qd-metric-label">每周额度 · 剩余</div><div class="qd-sheet-number">$594.57</div><div class="qd-meter"><span style="width:99%"></span></div><div class="qd-sheet-record"><span>今日实际消耗</span><span>$5.43</span></div><div class="qd-sheet-record"><span>总额度</span><span>$600.00</span></div><div class="qd-sheet-record"><span>重置时间</span><span>11/05 09:00</span></div>` : tab === 'history' ? `<div class="qd-metric-label">每日最后一次余量 · 演示快照</div>${[['11/02','$594.57'],['11/01','$596.20'],['10/31','$598.10'],['10/30','$600.00']].map(row => `<div class="qd-sheet-record"><span>${row[0]}</span><span>${row[1]}</span></div>`).join('')}` : `<div class="qd-sheet-record"><span>显示名称</span><span>Pro 工作站</span></div><div class="qd-sheet-record"><span>置顶到总览</span><span>已开启</span></div><div class="qd-sheet-record"><span>自动查询</span><span>1 分钟</span></div>`;
+  }
+  function page(phone, value) {
+    phone.querySelectorAll('[data-page]').forEach(button => button.setAttribute('aria-selected', String(button.dataset.page === value)));
+    phone.querySelector('.qd-main').innerHTML = value === 'overview' ? overview : value === 'connections' ? `<div class="qd-placeholder-page"><h3>连接</h3><div class="qd-metric-label">演示 · 三个常用站点</div><div class="qd-placeholder-row"><span>Pro 工作站</span><span>已连接</span></div><div class="qd-placeholder-row"><span>私人反代</span><span>已连接</span></div><div class="qd-placeholder-row"><span>OpenRouter</span><span>已连接</span></div></div>` : `<div class="qd-placeholder-page"><h3>设置</h3><div class="qd-placeholder-row"><span>外观</span><span>${state.appearance}</span></div><div class="qd-placeholder-row"><span>软件名试排</span><span class="qd-preview-name">${state.name}</span></div><div class="qd-placeholder-row"><span>桌面与锁屏</span><span>小组件</span></div><div class="qd-placeholder-row"><span>界面</span><span>设计预览</span></div></div>`;
+    if (globalThis.lucide) lucide.createIcons({ attrs: { width: 16, height: 16 } });
+  }
+  function render() {
+    root.querySelectorAll('.qd-phone').forEach(phone => {
+      phone.style.colorScheme = state.appearance === '浅色' ? 'light' : state.appearance === '深色' ? 'dark' : 'light dark';
+      phone.querySelector('.qd-name').textContent = state.name;
+      const label = phone.querySelector('.qd-preview-name'); if (label) label.textContent = state.name;
+    });
+  }
+  function remember() {
+    window.openai?.setWidgetState({ modelContent: { name: state.name }, privateContent: { appearance: state.appearance } }).catch(() => {});
+  }
+  root.querySelectorAll('.qd-phone').forEach(phone => {
+    phone.innerHTML = shell(); page(phone, 'overview'); detail(phone, 'overview');
+    const local = { radius: 22, blur: 28 }; settings.set(phone, local);
+    phone.addEventListener('click', event => {
+      const target = event.target.closest('button'); if (!target) return;
+      if (target.dataset.page) page(phone, target.dataset.page);
+      if (target.dataset.detail) detail(phone, target.dataset.detail);
+      if (target.dataset.action === 'detail') { phone.querySelector('.qd-overlay').hidden = false; detail(phone, 'overview'); }
+      if (target.dataset.action === 'close') phone.querySelector('.qd-overlay').hidden = true;
+      if (target.dataset.action === 'connections') page(phone, 'connections');
+      if (target.dataset.action === 'refresh') { const label = phone.querySelector('.qd-list-title small'); if (label) label.textContent = '● 已刷新 · 演示数据'; }
+    });
+    if (globalThis.Tweak) {
+      const tweak = new Tweak({ container: phone, onChange: () => { phone.style.setProperty('--qd-radius', `${local.radius}px`); phone.style.setProperty('--qd-blur', `${local.blur}px`); } });
+      tweak.addSlider(local, 'radius', { label: '卡片圆角', min: 14, max: 30, unit: 'px' });
+      tweak.addSlider(local, 'blur', { label: '磨砂强度', min: 12, max: 44, unit: 'px' });
+    }
+  });
+  render();
+  if (globalThis.Tweak) {
+    const shared = new Tweak({ container: root, onChange: () => { render(); remember(); } });
+    shared.addSelect(state, 'name', { label: '软件名试排', options: names });
+    shared.addSelect(state, 'appearance', { label: '预览外观', options: ['跟随系统','浅色','深色'] });
+  }
+  window.addEventListener('openai:set_globals', event => {
+    const next = event.detail?.globals?.widgetState; if (!next) return;
+    if (names.includes(next.modelContent?.name)) state.name = next.modelContent.name;
+    if (['跟随系统','浅色','深色'].includes(next.privateContent?.appearance)) state.appearance = next.privateContent.appearance;
+    render();
+  });
+})();
+</script>

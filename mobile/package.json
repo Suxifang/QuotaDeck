@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "main": "expo-router/entry",
   "dependencies": {
+    "@expo/ui": "~58.0.26",
     "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "~58.0.22",
     "expo-blur": "~58.0.5",
@@ -17,6 +18,7 @@
     "expo-secure-store": "~58.0.2",
     "expo-sharing": "~58.0.21",
     "expo-status-bar": "~58.0.4",
+    "expo-widgets": "~58.0.26",
     "lucide-react-native": "^1.66.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
@@ -43,7 +45,8 @@
     "lint": "expo lint",
     "test": "vitest run",
     "build:web": "expo export --platform web",
-    "check": "npm run typecheck && npm run lint && npm test"
+    "check": "npm run typecheck && npm run lint && npm test",
+    "check:widgets": "node ../tools/check-widgets.mjs"
   },
   "private": true
 }

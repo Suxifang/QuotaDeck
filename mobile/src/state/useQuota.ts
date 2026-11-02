@@ -8,11 +8,13 @@ import { QuotaError } from '../providers/transport';
 import { createDemo } from './demo';
 import { deleteCredential, EMPTY_DATA, readCredential, readData, saveData, writeCredential } from './storage';
 import { createSessionRenewal } from './session';
+import { syncWidgets } from '../widgets/sync';
 
 export function useQuota() {
   const [saved, setSaved] = useState<SavedData>(EMPTY_DATA);
   const [ready, setReady] = useState(false);
   const [storageError, setStorageError] = useState('');
+  const [widgetError, setWidgetError] = useState('');
   const [demo, setDemo] = useState<SavedData | null>(null);
   const ref = useRef(saved);
   const refreshing = useRef(new Map<string, symbol>());
@@ -81,6 +83,11 @@ export function useQuota() {
 
   const demoActive = !!demo;
   useEffect(() => {
+    if (!ready) return;
+    try { syncWidgets(saved); setWidgetError(''); }
+    catch { setWidgetError('小组件暂未同步，重新打开应用后会重试'); }
+  }, [ready, saved]);
+  useEffect(() => {
     if (!ready || demoActive) return;
     void refreshAll();
     const timer = setInterval(() => { if (AppState.currentState === 'active' || AppState.currentState === null) void refreshAll(); }, saved.preferences.refreshSeconds * 1000);
@@ -126,7 +133,7 @@ export function useQuota() {
   }, [refreshOne]);
 
   const changePreferences = useCallback((patch: Partial<Preferences>) => update(data => ({ ...data, preferences: { ...data.preferences, ...patch } })), [update]);
-  return { data: demo ? { ...demo, preferences: saved.preferences } : saved, saved, ready, storageError,
+  return { data: demo ? { ...demo, preferences: saved.preferences } : saved, saved, ready, storageError, widgetError,
     isDemo: !!demo, enterDemo: () => setDemo(createDemo()), exitDemo: () => setDemo(null),
     refreshAll: async () => { if (demo) setDemo(createDemo()); else await refreshAll(); },
     refreshOne, addSources, changeSource, removeSource, reconnect, changePreferences,

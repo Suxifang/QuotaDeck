@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
-import { ArrowUpRight, Clock3, CloudOff, Layers3, Network, Sparkles, Wallet } from 'lucide-react-native';
+import { ChevronRight, Clock3, CloudOff, Layers3, Network, Sparkles, Wallet } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { QuotaMetric, Source, SourceState } from '../domain/types';
 import { PROVIDER_LABELS } from '../domain/types';
@@ -41,7 +41,7 @@ export function SourceCard({ source, state, threshold, onPress }: { source: Sour
         <View style={[styles.row, { gap: 11, flex: 1 }]}><ProviderMark source={source} />
           <View style={{ flex: 1 }}><Text numberOfLines={1} style={{ color: t.ink, fontSize: 15, fontWeight: '700', letterSpacing: -.25 }}>{source.name}</Text>
             <Text style={{ color: t.secondary, fontSize: 10, marginTop: 5, letterSpacing: .1 }}>{PROVIDER_LABELS[source.resolvedKind ?? source.kind]}</Text></View></View>
-        {state?.refreshing ? <ActivityIndicator size="small" color={t.accent} /> : <ArrowUpRight size={17} color={t.muted} strokeWidth={1.5} />}
+        {state?.refreshing ? <ActivityIndicator size="small" color={t.accent} /> : <View style={[styles.row, { gap: 2 }]}><Text style={{ color: t.secondary, fontSize: 10 }}>详情</Text><ChevronRight size={14} color={t.muted} strokeWidth={1.5} /></View>}
       </View>
       <View style={{ gap: 10 }}>
         <View style={[styles.between, { alignItems: 'flex-end', gap: 10 }]}>

@@ -2,6 +2,8 @@
 
 在 iPhone 上集中查看 Sub2API 套餐、反代上游账号与其他 API 额度。使用 Expo / React Native 开发，Windows 可开发和预览，通过 GitHub macOS 构建未签名 IPA，自行签名安装。
 
+本项目采用 MIT 许可证开源。源码与正式版本统一在 `Suxifang/QuotaDeck` 维护；下载 IPA 请前往本仓库的 [Releases](https://github.com/Suxifang/QuotaDeck/releases/latest)。安装方法见 [安装与更新](docs/RELEASE_README.md)。
+
 ## 已实现
 
 - 通透磨砂的总览、连接与设置；支持浅色、深色、系统外观。天青与鼠尾草色的柔和背景、清晰的额度数字；浮动底栏使用连续滑动的玻璃透镜，带按压和轻微回弹。iOS 26 使用原生 Liquid Glass，较旧系统使用模糊效果，并遵循降低透明度与减弱动态效果设置。
@@ -12,7 +14,7 @@
 - 区分后台采样与手机查询时间。采样过旧、缺少采样时间或已过重置时间时明确提示，不虚构重置后的额度。
 - iOS 凭据存入系统钥匙串，后台密码不落盘；导出配置不含凭据。网页预览凭据只保留在当前页面内存中。
 - 明确标识、独立于真实账号的演示模式。
-- 「设置 → 版本更新」读取独立公开发行仓库的正式版；支持更新说明、下载进度、取消、大小与 SHA-256 校验，以及系统分享导入 LCSign。可选每六小时的前台自动检查，默认关闭。源码保留在私有仓库。
+- 「设置 → 版本更新」读取本仓库 Releases 的正式版；支持更新说明、下载进度、取消、大小与 SHA-256 校验，以及系统分享导入 LCSign。可选每六小时的前台自动检查，默认关闭。
 - iOS 小号桌面卡片、中号多账号卡片及矩形锁屏小组件；置顶优先，可选关注账号，点击进入对应详情。应用查询后同步，15 分钟后或已过重置时间标记待更新。应用关闭后暂不主动抓取额度。
 
 ## 本机预览
@@ -27,7 +29,9 @@ npm run web
 
 ## iOS 安装包
 
-推送 `main` 或手动运行 **Check and build iOS** 工作流。检查通过后，macOS 会生成原生项目、编译 Release，并将 `QuotaDeck-unsigned.ipa` 上传至 **QuotaDeck-unsigned-IPA** 构建附件。下载后使用自己的签名方式安装。
+普通用户可从本仓库的 Releases 下载 `Yudu-版本号.ipa` 与 `SHA256SUMS.txt`，使用自己的签名方式安装。
+
+开发者推送 `main` 或手动运行 **Check and build iOS** 工作流。检查通过后，macOS 会生成原生项目、编译 Release，并将 `QuotaDeck-unsigned.ipa` 上传至 **QuotaDeck-unsigned-IPA** 构建附件。构建附件用于验证；正式发布使用 [发布流程](docs/UPDATES.md)，标签绑定产生该 IPA 的源码提交。
 
 构建不需要 Apple 开发者账号、Expo 账号或签名证书。未签名 IPA 无法直接安装，需自行签名。最低系统版本由 Expo 58 原生依赖约束（当前为 iOS 16.4）；原生玻璃效果需要 iOS 26。
 
@@ -49,6 +53,8 @@ npm run build:web
 见 [接口与数据说明](docs/PROVIDERS.md) 和 [参考项目及实际复用](docs/REFERENCE_REVIEW.md)。修改并复用了三个 MIT 项目的实际模块；来源、固定版本和完整许可保存在 `THIRD_PARTY_NOTICES.md`、`licenses/`，以及应用内的开源致谢。
 
 所有源码、依赖、本机参考克隆、缓存及生成附件均放在本项目文件夹内；缓存、凭据与构建产物不提交到 GitHub。
+
+本地生成产物不进入 Git 源码树；正式 IPA 仅作为本仓库 Releases 的附件提供。原 `Yudu-Releases` 仓库保留 0.2.0 → 0.2.1 过渡升级，后续只维护本仓库。
 
 ## 品牌与发行
 

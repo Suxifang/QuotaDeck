@@ -27,6 +27,9 @@ jobs:
           cache-dependency-path: mobile/package-lock.json
       - run: npm ci
       - run: npm run check
+      - name: Check release publishing
+        working-directory: .
+        run: python3 -m unittest discover -s tools/tests -v
       - run: npm run check:widgets
       - run: npm run build:web
       - uses: actions/upload-artifact@v4

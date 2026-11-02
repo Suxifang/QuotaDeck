@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { AUTO_CHECK_INTERVAL, compareVersions, fetchLatestRelease, LATEST_RELEASE_API, MAX_IPA_BYTES, parseGitHubRelease, RELEASES_URL, shouldAutoCheck, validateRelease, verifyAssetBytes, type ReleaseFetcher } from '../src/updates/releases';
+import { AUTO_CHECK_INTERVAL, compareVersions, fetchLatestRelease, LATEST_RELEASE_API, MAX_IPA_BYTES, parseGitHubRelease, RELEASE_REPOSITORY, RELEASES_URL, shouldAutoCheck, validateRelease, verifyAssetBytes, type ReleaseFetcher } from '../src/updates/releases';
 
 const bytes = new Uint8Array([0x50, 0x4b, 0x03, 0x04, 1, 2, 3, 4]);
 async function hash(data: Uint8Array): Promise<string> {
@@ -14,6 +14,14 @@ function github() {
 }
 
 describe('official update metadata and version ordering', () => {
+  it('uses the source repository and rejects packages or cached metadata from the retired channel', () => {
+    expect(RELEASE_REPOSITORY).toBe('Suxifang/QuotaDeck');
+    const oldUrl = 'https://github.com/Suxifang/Yudu-Releases/releases';
+    const retired = { ...github(), html_url: `${oldUrl}/tag/v0.3.0`, assets: [{ ...github().assets[0], browser_download_url: `${oldUrl}/download/v0.3.0/Yudu-0.3.0.ipa` }] };
+    expect(() => parseGitHubRelease(retired)).toThrow();
+    const cached = parseGitHubRelease(github());
+    expect(() => validateRelease({ ...cached, pageUrl: retired.html_url, downloadUrl: retired.assets[0].browser_download_url })).toThrow();
+  });
   it('compares numbers instead of lexicographic strings and refuses prerelease or malformed versions', () => {
     expect(compareVersions('0.10.0', '0.2.0')).toBe(1);
     expect(compareVersions('1.0.0', '0.99.99')).toBe(1);

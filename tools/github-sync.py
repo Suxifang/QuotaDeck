@@ -59,7 +59,7 @@ try:
             print(json.dumps({'existing': True, 'repository': data['full_name'], 'private': data['private']}))
         except urllib.error.HTTPError as error:
             if error.code != 404: raise
-            data = api('/user/repos', {'name': 'QuotaDeck', 'private': True, 'description': '余量 · iOS quota dashboard for Sub2API relays and other API providers', 'auto_init': False})
+            data = api('/user/repos', {'name': 'QuotaDeck', 'private': False, 'description': '余度 · Yudu — open-source iOS quota dashboard for Sub2API relays and other API providers', 'auto_init': False})
             print(json.dumps({'created': True, 'repository': data['full_name'], 'private': data['private']}))
     elif action == 'release-setup':
         from release_channel import setup
@@ -68,7 +68,7 @@ try:
         from release_channel import public_repo
         release_repo = public_repo(api, owner)
         releases = api('/repos/' + release_repo + '/releases?per_page=3')
-        print(json.dumps([{'tag': release['tag_name'], 'draft': release['draft'], 'url': release['html_url'], 'assets': [{'name': asset['name'], 'size': asset['size'], 'digest': asset.get('digest')} for asset in release['assets']]} for release in releases]))
+        print(json.dumps([{'tag': release['tag_name'], 'draft': release['draft'], 'url': release['html_url'], 'assets': [{'name': asset['name'], 'size': asset['size'], 'digest': asset.get('digest'), 'url': asset['browser_download_url']} for asset in release['assets']]} for release in releases]))
     elif action == 'publish-release':
         from release_channel import publish
         publish(api, opener, token, owner, ROOT, sys.argv[2])

@@ -50,7 +50,7 @@ export function DetailSheet({ source, controller, onClose, onReconnect }: { sour
   return <Sheet visible title={source.name} subtitle={PROVIDER_LABELS[source.resolvedKind ?? source.kind]} onClose={onClose}>
     <View style={{ flexDirection: 'row', padding: 4, gap: 4, borderRadius: 14, borderCurve: 'continuous', backgroundColor: t.input }}>
       {([{ id: 'overview', label: '额度概览' }, { id: 'history', label: '余量记录' }, ...(!demo ? [{ id: 'manage' as const, label: '连接管理' }] : [])] as const).map(item => <Pressable key={item.id} accessibilityRole="tab" accessibilityLabel={item.label} accessibilityState={{ selected: section === item.id }} onPress={() => setSection(item.id)}
-        style={{ flex: 1, alignItems: 'center', paddingVertical: 11, borderRadius: 10, borderCurve: 'continuous', backgroundColor: section === item.id ? t.dark ? '#3A526F' : 'white' : 'transparent' }}>
+        style={{ flex: 1, alignItems: 'center', paddingVertical: 11, borderRadius: 10, borderCurve: 'continuous', backgroundColor: section === item.id ? t.selected : 'transparent' }}>
         <Text style={{ color: section === item.id ? t.ink : t.secondary, fontSize: 12, fontWeight: section === item.id ? '600' : '400' }}>{item.label}</Text>
       </Pressable>)}
     </View>

@@ -20,8 +20,7 @@ export function Logo({ size = 40 }: { size?: number }) {
   </LinearGradient>;
 }
 
-export function Glass({ children, style, subtle = false }: React.PropsWithChildren<{ style?: StyleProp<ViewStyle>; subtle?: boolean }>) {
-  const t = useTheme();
+export function useGlassPreferences() {
   const [reduce, setReduce] = useState(false);
   useEffect(() => {
     if (Platform.OS !== 'ios') return;
@@ -31,13 +30,19 @@ export function Glass({ children, style, subtle = false }: React.PropsWithChildr
   }, []);
   let liquid = false;
   try { liquid = Platform.OS === 'ios' && !reduce && isGlassEffectAPIAvailable() && isLiquidGlassAvailable(); } catch { /* unsupported OS */ }
+  return { reduce, liquid };
+}
+
+export function Glass({ children, style, subtle = false }: React.PropsWithChildren<{ style?: StyleProp<ViewStyle>; subtle?: boolean }>) {
+  const t = useTheme();
+  const { reduce, liquid } = useGlassPreferences();
   const shell: ViewStyle = { borderRadius: radius.card, borderCurve: 'continuous', borderWidth: 1, borderColor: t.border,
-    backgroundColor: reduce ? t.sheet : subtle ? (t.dark ? 'rgba(25,46,68,0.5)' : 'rgba(255,255,255,0.42)') : t.panel,
-    overflow: 'hidden', boxShadow: t.dark ? '0px 12px 35px rgba(0,0,0,0.12)' : '0px 10px 32px rgba(39,77,115,0.055)' };
-  const web = Platform.OS === 'web' && !reduce ? { backdropFilter: 'blur(24px) saturate(160%)', WebkitBackdropFilter: 'blur(24px) saturate(160%)' } as ViewStyle : {};
+    backgroundColor: reduce ? t.sheet : subtle || liquid ? t.panelSubtle : t.panel,
+    overflow: 'hidden', boxShadow: t.dark ? '0px 12px 35px rgba(0,0,0,0.10)' : '0px 10px 32px rgba(36,62,46,0.035)' };
+  const web = Platform.OS === 'web' && !reduce ? { backdropFilter: 'blur(28px) saturate(120%)', WebkitBackdropFilter: 'blur(28px) saturate(120%)' } as ViewStyle : {};
   return <View style={[shell, web, style]}>
-    {liquid ? <GlassView pointerEvents="none" glassEffectStyle="regular" tintColor={t.dark ? '#182D4420' : '#FFFFFF18'} colorScheme={t.dark ? 'dark' : 'light'} style={StyleSheet.absoluteFill} />
-      : Platform.OS === 'ios' && !reduce ? <BlurView pointerEvents="none" tint={t.dark ? 'dark' : 'extraLight'} intensity={35} style={StyleSheet.absoluteFill} /> : null}
+    {liquid ? <GlassView pointerEvents="none" glassEffectStyle="regular" tintColor={t.glassTint} colorScheme={t.dark ? 'dark' : 'light'} style={StyleSheet.absoluteFill} />
+      : Platform.OS === 'ios' && !reduce ? <BlurView pointerEvents="none" tint={t.dark ? 'systemUltraThinMaterialDark' : 'systemUltraThinMaterialLight'} intensity={30} style={StyleSheet.absoluteFill} /> : null}
     {children}
   </View>;
 }
@@ -46,7 +51,7 @@ export function IconButton({ icon: Icon, label, onPress, color, active, disabled
   const t = useTheme();
   return <Pressable accessibilityRole="button" accessibilityLabel={label} disabled={disabled} hitSlop={5} onPress={onPress}
     style={({ pressed }) => ({ width: size, height: size, borderRadius: size / 2, alignItems: 'center', justifyContent: 'center',
-      backgroundColor: active ? t.accentSoft : t.dark ? 'rgba(255,255,255,0.055)' : 'rgba(255,255,255,0.65)', opacity: disabled ? .4 : pressed ? .65 : 1,
+      backgroundColor: active ? t.accentSoft : t.control, opacity: disabled ? .4 : pressed ? .65 : 1,
       borderWidth: 1, borderColor: t.border })}><Icon size={20} strokeWidth={1.8} color={color ?? t.ink} /></Pressable>;
 }
 
@@ -54,10 +59,10 @@ export function Button({ title, onPress, secondary, loading, disabled, icon: Ico
   const t = useTheme();
   return <Pressable accessibilityRole="button" accessibilityLabel={title} disabled={disabled || loading} onPress={onPress}
     style={({ pressed }) => ({ minHeight: 52, borderRadius: radius.button, borderCurve: 'continuous', paddingVertical: 13, paddingHorizontal: 19,
-      backgroundColor: secondary ? t.accentSoft : t.dark ? '#699FF9' : '#347BED', flexDirection: 'row', gap: 9, alignItems: 'center', justifyContent: 'center',
+      backgroundColor: secondary ? t.accentSoft : t.accent, flexDirection: 'row', gap: 9, alignItems: 'center', justifyContent: 'center',
       opacity: disabled ? .4 : pressed ? .78 : 1, transform: [{ scale: pressed ? .985 : 1 }] })}>
-    {loading ? <ActivityIndicator size="small" color={secondary ? t.accent : 'white'} /> : Icon ? <Icon size={18} color={secondary ? t.accent : '#FFFFFF'} /> : null}
-    <Text style={{ color: secondary ? t.accent : '#FFFFFF', fontSize: 15, fontWeight: '600' }}>{title}</Text>
+    {loading ? <ActivityIndicator size="small" color={secondary ? t.accent : t.accentForeground} /> : Icon ? <Icon size={18} color={secondary ? t.accent : t.accentForeground} /> : null}
+    <Text style={{ color: secondary ? t.accent : t.accentForeground, fontSize: 15, fontWeight: '600' }}>{title}</Text>
   </Pressable>;
 }
 
@@ -85,7 +90,7 @@ export function Field({ label, hint, hideLabel = false, ...input }: TextInputPro
 export function Sheet({ visible, title, subtitle, onClose, children }: React.PropsWithChildren<{ visible: boolean; title: string; subtitle?: string; onClose: () => void }>) {
   const t = useTheme(); const insets = useSafeAreaInsets();
   return <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
-    <View style={{ flex: 1, backgroundColor: t.dark ? 'rgba(0,5,15,0.65)' : 'rgba(39,60,85,0.22)', justifyContent: 'flex-end' }}>
+    <View style={{ flex: 1, backgroundColor: t.dark ? 'rgba(3,15,9,0.65)' : 'rgba(39,65,56,0.22)', justifyContent: 'flex-end' }}>
       <Pressable accessibilityLabel="关闭面板" onPress={onClose} style={StyleSheet.absoluteFill} />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ width: '100%', maxWidth: 580, maxHeight: '94%', alignSelf: 'center' }}>
         <View style={{ flexShrink: 1, backgroundColor: t.sheet, borderTopLeftRadius: radius.sheet, borderTopRightRadius: radius.sheet, borderCurve: 'continuous', borderWidth: 1, borderColor: t.border, overflow: 'hidden' }}>

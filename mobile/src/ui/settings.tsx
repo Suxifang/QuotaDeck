@@ -14,7 +14,7 @@ import { WidgetSettings } from './widget-settings';
 
 function Segments<T extends string | number>({ options, value, onChange }: { options: { value: T; label: string }[]; value: T; onChange: (value: T) => void }) {
   const t = useTheme(); return <View style={{ flexDirection: 'row', gap: 5, backgroundColor: t.input, borderRadius: 14, padding: 4 }}>{options.map(option => <Pressable key={option.value} onPress={() => onChange(option.value)} accessibilityRole="button" accessibilityState={{ selected: value === option.value }}
-    style={{ flex: 1, borderRadius: 11, paddingVertical: 11, alignItems: 'center', backgroundColor: value === option.value ? (t.dark ? '#3A526F' : 'white') : 'transparent' }}><Text style={{ color: value === option.value ? t.ink : t.secondary, fontSize: 11, fontWeight: value === option.value ? '600' : '400' }}>{option.label}</Text></Pressable>)}</View>;
+    style={{ flex: 1, borderRadius: 11, paddingVertical: 11, alignItems: 'center', backgroundColor: value === option.value ? t.selected : 'transparent' }}><Text style={{ color: value === option.value ? t.ink : t.secondary, fontSize: 11, fontWeight: value === option.value ? '600' : '400' }}>{option.label}</Text></Pressable>)}</View>;
 }
 
 export function Settings({ controller }: { controller: QuotaController }) {
@@ -38,7 +38,7 @@ export function Settings({ controller }: { controller: QuotaController }) {
     <Glass style={{ padding: 21, gap: 20 }}>
       <View style={[styles.row, { gap: 9 }]}><Droplets size={18} color={t.accent} /><Text style={{ color: t.ink, fontSize: 14, fontWeight: '600' }}>外观</Text><Text style={{ color: t.muted, fontSize: 10 }}>Liquid Glass</Text></View>
       <Segments<Preferences['theme']> options={[{ value: 'light', label: '浅色' }, { value: 'dark', label: '深色' }, { value: 'system', label: '跟随系统' }]} value={prefs.theme} onChange={theme => controller.changePreferences({ theme })} />
-      <Text style={{ color: t.secondary, fontSize: 11, lineHeight: 20 }}>轻透的玻璃质感，配合清晰的数字。会跟随系统的降低透明度设置。</Text>
+      <Text style={{ color: t.secondary, fontSize: 11, lineHeight: 20 }}>通透的磨砂质感，配合清晰的数字与流动的玻璃底栏。会跟随系统的降低透明度与减弱动态效果设置。</Text>
     </Glass>
     <Glass style={{ padding: 21, gap: 19 }}>
       <View style={[styles.row, { gap: 9 }]}><RefreshCw size={17} color={t.accent} /><Text style={{ color: t.ink, fontSize: 14, fontWeight: '600' }}>自动查询间隔</Text></View>

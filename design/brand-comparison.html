@@ -1,0 +1,135 @@
+<style>
+#quota-brand-preview { --qb-font: -apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI","Microsoft YaHei",sans-serif; font-family: var(--qb-font); }
+#quota-brand-preview .qb-stage { min-height: 900px; box-sizing: border-box; padding: 22px 0 26px; display: flex; flex-direction: column; gap: 22px; align-items: center; }
+#quota-brand-preview .qb-identity { display: flex; align-items: center; gap: 24px; width: min(350px,100%); box-sizing: border-box; padding: 0 12px; color: light-dark(#18363c,#f0f5f1); }
+#quota-brand-preview .qb-identity img { width: 96px; height: 96px; border-radius: 23px; box-shadow: 0 9px 26px light-dark(#24483725,#00000035); }
+#quota-brand-preview .qb-identity h2 { font-size: 30px; line-height: 1.3; margin: 0; font-weight: 600; letter-spacing: 3px; }
+#quota-brand-preview .qb-identity .qb-latin { font-size: 10px; letter-spacing: 3px; margin-top: 5px; opacity: .65; }
+#quota-brand-preview .qb-identity .qb-concept { font-size: 12px; margin-top: 10px; opacity: .7; letter-spacing: 1px; }
+#quota-brand-preview .qb-phone { --qb-ink: light-dark(#18363c,#f0f5f1); --qb-sub: light-dark(#405d62,#c3d3cc); --qb-muted: light-dark(#567074,#a6bdb3); --qb-accent: light-dark(#256d5e,#b8dac1); --qb-line: light-dark(#264f5321,#e9f6ed24); --qb-border: light-dark(#ffffffa3,#edfff02b); --qb-card: light-dark(#f6fffa66,#e7f8ec0e); --qb-control: light-dark(#ebfcf2a3,#c4e1c724); width: min(360px,100%); height: 708px; border-radius: 46px; border: 6px solid light-dark(#28383c,#263137); overflow: hidden; box-sizing: border-box; position: relative; isolation: isolate; font-size: 12px; line-height: 1.45; color: var(--qb-ink); background: light-dark(#d5e5e5,#34484d); box-shadow: 0 16px 35px light-dark(#1d3f3420,#00000035); }
+#quota-brand-preview .qb-ambient { position: absolute; inset: -30px; z-index: -1; background: radial-gradient(ellipse at 8% 9%,light-dark(#b9d7e1,#4c696d),transparent 65%),radial-gradient(ellipse at 100% 64%,light-dark(#9caa75,#536b3d),transparent 64%),linear-gradient(155deg,light-dark(#d5e5e5,#34484d),light-dark(#c7cfae,#293b29)); filter: blur(24px); }
+#quota-brand-preview .qb-phone { height: 812px; }
+#quota-brand-preview .qb-content { padding: 17px 18px 96px; }
+#quota-brand-preview .qb-status { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; padding: 0 8px; }
+#quota-brand-preview .qb-island { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 90px; height: 24px; border-radius: 20px; background: #152323; }
+#quota-brand-preview .qb-header { display: flex; align-items: center; justify-content: space-between; margin-top: 30px; }
+#quota-brand-preview .qb-brand { display: flex; gap: 9px; align-items: center; font-size: 20px; font-weight: 600; letter-spacing: 1px; }
+#quota-brand-preview .qb-brand img { width: 31px; height: 31px; border-radius: 8px; }
+#quota-brand-preview button { font: inherit; color: inherit; -webkit-tap-highlight-color: transparent; }
+#quota-brand-preview .qb-actions { display: flex; gap: 8px; }
+#quota-brand-preview .qb-round { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--qb-border); background: var(--qb-card); padding: 0; }
+#quota-brand-preview .qb-round svg { width: 16px; height: 16px; }
+#quota-brand-preview .qb-hero { margin-top: 27px; }
+#quota-brand-preview .qb-eyebrow { color: var(--qb-sub); font-size: 9px; letter-spacing: .6px; }
+#quota-brand-preview .qb-headline { font-size: 26px; font-weight: 600; letter-spacing: -.8px; margin: 10px 0 5px; }
+#quota-brand-preview .qb-subtitle { font-size: 11px; color: var(--qb-sub); }
+#quota-brand-preview .qb-stats { display: flex; padding: 14px 0; border-block: 1px solid var(--qb-line); margin-top: 20px; }
+#quota-brand-preview .qb-stat { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+#quota-brand-preview .qb-stat + .qb-stat { border-left: 1px solid var(--qb-line); }
+#quota-brand-preview .qb-stat b { font-size: 21px; font-weight: 500; font-variant-numeric: tabular-nums; }
+#quota-brand-preview .qb-stat span { font-size: 9px; color: var(--qb-sub); }
+#quota-brand-preview .qb-list { display: flex; justify-content: space-between; margin: 18px 0 12px; font-size: 11px; }
+#quota-brand-preview .qb-list small { font-size: 9px; color: var(--qb-sub); }
+#quota-brand-preview .qb-quota { width: 100%; padding: 16px; box-sizing: border-box; text-align: left; border-radius: 23px; border: 1px solid var(--qb-border); background: var(--qb-card); backdrop-filter: blur(28px) saturate(120%); -webkit-backdrop-filter: blur(28px) saturate(120%); display: block; }
+#quota-brand-preview .qb-quota + .qb-quota { margin-top: 12px; }
+#quota-brand-preview .qb-quota-header { display: flex; gap: 9px; align-items: center; }
+#quota-brand-preview .qb-provider { background: var(--qb-control); color: var(--qb-accent); border-radius: 10px; width: 31px; height: 31px; display: grid; place-items: center; }
+#quota-brand-preview .qb-provider svg { width: 17px; height: 17px; }
+#quota-brand-preview .qb-source-name { flex: 1; font-size: 12px; font-weight: 600; }
+#quota-brand-preview .qb-source-name small { display: block; color: var(--qb-sub); font-size: 9px; font-weight: 400; margin-top: 3px; }
+#quota-brand-preview .qb-hint { display: flex; align-items: center; gap: 1px; font-size: 9px; color: var(--qb-sub); }
+#quota-brand-preview .qb-hint svg { width: 12px; height: 12px; }
+#quota-brand-preview .qb-amount-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 15px; gap: 8px; }
+#quota-brand-preview .qb-label { font-size: 10px; color: var(--qb-sub); }
+#quota-brand-preview .qb-amount { font-size: 36px; line-height: 1.2; font-weight: 500; letter-spacing: -1.6px; margin-top: 5px; font-variant-numeric: tabular-nums; }
+#quota-brand-preview .qb-today { text-align: right; padding-bottom: 4px; }
+#quota-brand-preview .qb-today b { display: block; margin-top: 6px; font-size: 13px; font-weight: 500; }
+#quota-brand-preview .qb-meter { height: 4px; border-radius: 3px; background: light-dark(#2d695529,#e5f2e029); overflow: hidden; margin-top: 11px; }
+#quota-brand-preview .qb-meter span { width: 99%; height: 100%; display: block; border-radius: inherit; background: var(--qb-accent); }
+#quota-brand-preview .qb-meta { display: flex; justify-content: space-between; color: var(--qb-sub); font-size: 9px; margin-top: 11px; }
+#quota-brand-preview .qb-compact .qb-amount { font-size: 28px; }
+#quota-brand-preview .qb-compact .qb-amount-row { margin-top: 11px; }
+#quota-brand-preview .qb-warning { font-size: 9px; color: light-dark(#815618,#f1cf94); background: light-dark(#fff5d9d6,#6e562880); border-radius: 6px; padding: 4px 6px; }
+#quota-brand-preview .qb-dock { position: absolute; bottom: 21px; left: 16px; right: 16px; height: 68px; padding: 5px; border-radius: 36px; border: 1px solid var(--qb-border); box-sizing: border-box; background: light-dark(#f2fcef5c,#14281d7a); backdrop-filter: blur(30px) saturate(145%); -webkit-backdrop-filter: blur(30px) saturate(145%); display: flex; box-shadow: 0 10px 25px light-dark(#1c372522,#0000003d),inset 0 1px 1px light-dark(#ffffff70,#efffe52b); isolation: isolate; --qb-index: 0; }
+#quota-brand-preview .qb-lens { position: absolute; left: 5px; top: 5px; width: calc((100% - 10px)/3); height: 56px; box-sizing: border-box; z-index: -1; border-radius: 29px; border: 1px solid light-dark(#ffffffdb,#ebffe661); background: linear-gradient(145deg,light-dark(#ffffff94,#f0ffeb29),light-dark(#ffffff08,#f0ffeb04) 55%,light-dark(#ffffff38,#f0ffeb15)); box-shadow: 0 3px 12px light-dark(#2a4d3417,#00000026),inset 0 1px 2px light-dark(#ffffff80,#ffffff1a); backdrop-filter: blur(9px) saturate(130%); -webkit-backdrop-filter: blur(9px) saturate(130%); transform: translateX(calc(var(--qb-index)*100%)); transition: transform 540ms cubic-bezier(.2,.82,.21,1.12); }
+#quota-brand-preview .qb-lens.qb-flow { animation: qb-flow 470ms ease-out; }
+@keyframes qb-flow { 0% { scale: 1; } 24% { scale: 1.075 .94; } 62% { scale: .99 1.015; } 100% { scale: 1; } }
+#quota-brand-preview .qb-nav { border: 0; background: transparent; border-radius: 28px; padding: 7px 0; flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--qb-sub); font-size: 9px; }
+#quota-brand-preview .qb-nav svg { width: 19px; height: 19px; stroke-width: 1.65; transition: transform 350ms cubic-bezier(.2,.8,.2,1.1); }
+#quota-brand-preview .qb-nav[aria-selected="true"] { color: var(--qb-ink); }
+#quota-brand-preview .qb-nav[aria-selected="true"] svg { transform: translateY(-1px); stroke-width: 1.9; }
+#quota-brand-preview .qb-home { width: 102px; height: 4px; border-radius: 4px; background: var(--qb-ink); opacity: .7; bottom: 7px; left: calc(50% - 51px); position: absolute; }
+#quota-brand-preview .qb-page-title { margin: 30px 0 25px; font-size: 27px; font-weight: 600; letter-spacing: -.8px; }
+#quota-brand-preview .qb-row { padding: 17px 0; border-bottom: 1px solid var(--qb-line); display: flex; align-items: center; justify-content: space-between; font-size: 12px; gap: 9px; }
+#quota-brand-preview .qb-row span + span { color: var(--qb-sub); font-size: 11px; }
+#quota-brand-preview .qb-desktop { display: flex; gap: 14px; align-items: center; width: min(330px,100%); color: light-dark(#405d62,#c3d3cc); font-size: 11px; box-sizing: border-box; padding: 0 8px; }
+#quota-brand-preview .qb-desktop img { width: 52px; height: 52px; border-radius: 12px; }
+#quota-brand-preview .qb-desktop .qb-small { width: 29px; height: 29px; border-radius: 7px; }
+#quota-brand-preview .qb-size { display: flex; align-items: center; gap: 9px; margin-left: auto; }
+@media(max-width: 360px) { #quota-brand-preview .qb-content { padding-inline: 15px; } #quota-brand-preview .qb-identity { gap: 20px; } #quota-brand-preview .qb-headline { font-size: 24px; } }
+@media(prefers-reduced-motion: reduce) { #quota-brand-preview .qb-lens { transition: none; } #quota-brand-preview .qb-lens.qb-flow { animation: none; } #quota-brand-preview .qb-nav svg { transition: none; } }
+</style>
+<div id="quota-brand-preview" aria-label="三组名称图标及液态玻璃底栏预览">
+  <div class="viz-carousel viz-dotted-background" aria-label="名称与图标方案" data-previous-label="上一款" data-next-label="下一款">
+    <section data-variant="余度 · 留白刻度" aria-label="余度方案"><div class="qb-stage" data-brand="yudu"></div></section>
+    <section data-variant="有余 · 半满之器" aria-label="有余方案" hidden><div class="qb-stage" data-brand="youyu"></div></section>
+    <section data-variant="余见 · 透光视窗" aria-label="余见方案" hidden><div class="qb-stage" data-brand="yujian"></div></section>
+  </div>
+</div>
+<script>
+(() => {
+  const root = document.getElementById('quota-brand-preview');
+  const artwork = { yudu: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDI0IiBoZWlnaHQ9IjEwMjQiIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiPgogIDx0aXRsZT7kvZnluqYgwrcg55WZ55m95Yi75bqmPC90aXRsZT4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYmFzZSIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiM5MUI4QjgiLz48c3RvcCBvZmZzZXQ9Ii41MiIgc3RvcC1jb2xvcj0iIzU0N0U3MiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzdGOTM2NSIvPjwvbGluZWFyR3JhZGllbnQ+CiAgICA8cmFkaWFsR3JhZGllbnQgaWQ9ImxpZ2h0IiBjeD0iLjA4IiBjeT0iMCIgcj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI0YxRkZGNyIgc3RvcC1vcGFjaXR5PSIuNTYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNGMUZGRjciIHN0b3Atb3BhY2l0eT0iMCIvPjwvcmFkaWFsR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9Im1hcmsiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjRkZGRkZGIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjREVFQ0UwIi8+PC9saW5lYXJHcmFkaWVudD4KICAgIDxmaWx0ZXIgaWQ9InNoYWRvdyIgeD0iLTQwJSIgeT0iLTQwJSIgd2lkdGg9IjE4MCUiIGhlaWdodD0iMTgwJSI+PGZlRHJvcFNoYWRvdyBkeD0iMCIgZHk9IjEyIiBzdGREZXZpYXRpb249IjEzIiBmbG9vZC1jb2xvcj0iIzFGNDYzRCIgZmxvb2Qtb3BhY2l0eT0iLjE0Ii8+PC9maWx0ZXI+CiAgPC9kZWZzPgogIDxwYXRoIGZpbGw9InVybCgjYmFzZSkiIGQ9Ik0wIDBoMTAyNHYxMDI0SDB6Ii8+CiAgPHBhdGggZmlsbD0idXJsKCNsaWdodCkiIGQ9Ik0wIDBoMTAyNHYxMDI0SDB6Ii8+CiAgPGcgZmlsdGVyPSJ1cmwoI3NoYWRvdykiIGZpbGw9Im5vbmUiIHN0cm9rZT0idXJsKCNtYXJrKSIgc3Ryb2tlLXdpZHRoPSI4OCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj4KICAgIDxwYXRoIGQ9Ik02NjEgMjk5YTI2MCAyNjAgMCAxIDAgODcgMzIzIi8+CiAgICA8cGF0aCBkPSJtNzQ4IDM3NCAzMCA2NyIvPgogIDwvZz4KPC9zdmc+Cg==', youyu: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDI0IiBoZWlnaHQ9IjEwMjQiIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiPgogIDx0aXRsZT7mnInkvZkgwrcg5Y2K5ruh5LmL5ZmoPC90aXRsZT4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYmFzZSIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiNDMUNCQjQiLz48c3RvcCBvZmZzZXQ9Ii40OCIgc3RvcC1jb2xvcj0iIzkxQTQ4NiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzUzNkY1QiIvPjwvbGluZWFyR3JhZGllbnQ+CiAgICA8cmFkaWFsR3JhZGllbnQgaWQ9ImxpZ2h0IiBjeD0iLjEiIGN5PSIwIiByPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjRkZGREVEIiBzdG9wLW9wYWNpdHk9Ii42Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRkZGREVEIiBzdG9wLW9wYWNpdHk9IjAiLz48L3JhZGlhbEdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtYXJrIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI0ZGRkZGRiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0U3RUZFMCIvPjwvbGluZWFyR3JhZGllbnQ+CiAgICA8ZmlsdGVyIGlkPSJzaGFkb3ciIHg9Ii00MCUiIHk9Ii00MCUiIHdpZHRoPSIxODAlIiBoZWlnaHQ9IjE4MCUiPjxmZURyb3BTaGFkb3cgZHg9IjAiIGR5PSIxMiIgc3RkRGV2aWF0aW9uPSIxMyIgZmxvb2QtY29sb3I9IiMzMDRCMzMiIGZsb29kLW9wYWNpdHk9Ii4xNCIvPjwvZmlsdGVyPgogIDwvZGVmcz4KICA8cGF0aCBmaWxsPSJ1cmwoI2Jhc2UpIiBkPSJNMCAwaDEwMjR2MTAyNEgweiIvPgogIDxwYXRoIGZpbGw9InVybCgjbGlnaHQpIiBkPSJNMCAwaDEwMjR2MTAyNEgweiIvPgogIDxnIGZpbHRlcj0idXJsKCNzaGFkb3cpIiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjbWFyaykiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCI+CiAgICA8cGF0aCBkPSJNMjk2IDMwNnYyNzhhMjE2IDIxNiAwIDAgMCA0MzIgMFYzMDYiIHN0cm9rZS13aWR0aD0iODAiLz4KICAgIDxwYXRoIGQ9Ik0zOTYgNDk0Yzc4LTQ2IDE1NCA0NiAyMzIgMCIgc3Ryb2tlLXdpZHRoPSI3MiIvPgogIDwvZz4KPC9zdmc+Cg==', yujian: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDI0IiBoZWlnaHQ9IjEwMjQiIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiPgogIDx0aXRsZT7kvZnop4Egwrcg6YCP5YWJ6KeG56qXPC90aXRsZT4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYmFzZSIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiNCMEM5RDQiLz48c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjNzI5NTlEIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNDc2Qzc3Ii8+PC9saW5lYXJHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0ibGlnaHQiIGN4PSIuMSIgY3k9IjAiIHI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiNGMkZGRkYiIHN0b3Atb3BhY2l0eT0iLjYyIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRjJGRkZGIiBzdG9wLW9wYWNpdHk9IjAiLz48L3JhZGlhbEdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtYXJrIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI0ZGRkZGRiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0RDRUNFRSIvPjwvbGluZWFyR3JhZGllbnQ+CiAgICA8ZmlsdGVyIGlkPSJzaGFkb3ciIHg9Ii00MCUiIHk9Ii00MCUiIHdpZHRoPSIxODAlIiBoZWlnaHQ9IjE4MCUiPjxmZURyb3BTaGFkb3cgZHg9IjAiIGR5PSIxMiIgc3RkRGV2aWF0aW9uPSIxMyIgZmxvb2QtY29sb3I9IiMyODRDNTciIGZsb29kLW9wYWNpdHk9Ii4xNCIvPjwvZmlsdGVyPgogIDwvZGVmcz4KICA8cGF0aCBmaWxsPSJ1cmwoI2Jhc2UpIiBkPSJNMCAwaDEwMjR2MTAyNEgweiIvPgogIDxwYXRoIGZpbGw9InVybCgjbGlnaHQpIiBkPSJNMCAwaDEwMjR2MTAyNEgweiIvPgogIDxnIGZpbHRlcj0idXJsKCNzaGFkb3cpIj4KICAgIDxwYXRoIGQ9Ik0yMzAgNTEyYzEzMi0yMjYgNDMyLTIyNiA1NjQgMC0xMzIgMjI2LTQzMiAyMjYtNTY0IDBaIiBmaWxsPSJ1cmwoI21hcmspIiBmaWxsLW9wYWNpdHk9Ii4xOCIgc3Ryb2tlPSJ1cmwoI21hcmspIiBzdHJva2Utd2lkdGg9IjU4IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgICA8Y2lyY2xlIGN4PSI1MTIiIGN5PSI1MTIiIHI9Ijg5IiBmaWxsPSJ1cmwoI21hcmspIi8+CiAgPC9nPgo8L3N2Zz4K' };
+  const brands = { yudu: { name: '余度', latin: 'YUDU', concept: '留白刻度' }, youyu: { name: '有余', latin: 'YOUYU', concept: '半满之器' }, yujian: { name: '余见', latin: 'YUJIAN', concept: '透光视窗' } };
+  const saved = window.openai?.widgetState;
+  const state = { appearance: ['跟随系统','浅色','深色'].includes(saved?.privateContent?.appearance) ? saved.privateContent.appearance : '跟随系统', motion: saved?.privateContent?.motion !== false };
+  const icon = name => `<i data-lucide="${name}" aria-hidden="true"></i>`;
+  const overview = `<div class="qb-hero"><div class="qb-eyebrow">11月2日 星期一 · 演示预览</div><div class="qb-headline">用量，一目了然。</div><div class="qb-subtitle">常用的 API 额度，都在这里。</div></div><div class="qb-stats"><div class="qb-stat"><b>03</b><span>监控账号</span></div><div class="qb-stat"><b>02</b><span>状态正常</span></div><div class="qb-stat"><b>01</b><span>需要留意</span></div></div><div class="qb-list"><span>全部额度 3</span><small>● 刚刚更新 · 演示</small></div><button class="qb-quota cursor-interaction" type="button" data-action="detail" aria-label="查看 Pro 工作站详情"><div class="qb-quota-header"><span class="qb-provider">${icon('layers-2')}</span><span class="qb-source-name">Pro 工作站<small>Sub2API 套餐</small></span><span class="qb-hint">详情 ${icon('chevron-right')}</span></div><div class="qb-amount-row"><div><div class="qb-label">每周额度 · 剩余</div><div class="qb-amount">$594.57</div></div><div class="qb-today"><span class="qb-label">今日消耗</span><b>$5.43</b></div></div><div class="qb-meter"><span></span></div><div class="qb-meta"><span>总额度 $600.00</span><span>3 天后重置</span></div></button><button class="qb-quota qb-compact cursor-interaction" type="button" data-action="detail" aria-label="查看私人反代详情"><div class="qb-quota-header"><span class="qb-provider">${icon('network')}</span><span class="qb-source-name">私人反代<small>Sub2API · Codex</small></span><span class="qb-hint">详情 ${icon('chevron-right')}</span></div><div class="qb-amount-row"><div><div class="qb-label">五小时额度 · 剩余</div><div class="qb-amount">82%</div></div><span class="qb-warning">七天剩余 16%</span></div><div class="qb-meter"><span style="width:82%"></span></div></button>`;
+  function page(stage, pageName, animate = true) {
+    const phone = stage.querySelector('.qb-phone');
+    const brand = brands[stage.dataset.brand];
+    const dock = phone.querySelector('.qb-dock');
+    const pages = ['overview','connections','settings'];
+    dock.style.setProperty('--qb-index', String(Math.max(0,pages.indexOf(pageName))));
+    phone.querySelectorAll('[data-page]').forEach(button => button.setAttribute('aria-selected', String(button.dataset.page === pageName)));
+    phone.querySelector('.qb-main').innerHTML = pageName === 'overview' ? overview : pageName === 'connections' ? `<div class="qb-page-title">连接你的世界。</div><div class="qb-label">演示 · 三个常用站点</div>${['Pro 工作站','私人反代','OpenRouter'].map(name => `<div class="qb-row"><span>${name}</span><span>已连接</span></div>`).join('')}` : `<div class="qb-page-title">按你的习惯。</div><div class="qb-row"><span>软件名称</span><span>${brand.name}</span></div><div class="qb-row"><span>外观</span><span>通透磨砂</span></div><div class="qb-row"><span>底部导航</span><span>滑动玻璃透镜</span></div><div class="qb-row"><span>桌面与锁屏</span><span>小组件</span></div>`;
+    const lens = dock.querySelector('.qb-lens');
+    lens.classList.remove('qb-flow');
+    if (animate && state.motion) { void lens.offsetWidth; lens.classList.add('qb-flow'); }
+    if (globalThis.lucide) lucide.createIcons({ attrs: { width: 16, height: 16 } });
+  }
+  root.querySelectorAll('.qb-stage').forEach(stage => {
+    const id = stage.dataset.brand; const brand = brands[id]; const src = artwork[id];
+    stage.innerHTML = `<div class="qb-identity"><img src="${src}" alt="${brand.name}图标"/><div><h2>${brand.name}</h2><div class="qb-latin">${brand.latin}</div><div class="qb-concept">${brand.concept}</div></div></div><div class="qb-phone" aria-label="${brand.name}应用与液态底栏预览"><div class="qb-ambient"></div><div class="qb-content"><div class="qb-status"><span>9:41</span><span>▮▮▮ Wi-Fi ▰</span></div><div class="qb-header"><div class="qb-brand"><img src="${src}" alt=""/><span>${brand.name}</span></div><div class="qb-actions"><button type="button" class="qb-round cursor-interaction" aria-label="刷新预览" data-action="refresh">${icon('refresh-cw')}</button><button type="button" class="qb-round cursor-interaction" aria-label="添加连接预览" data-page="connections">${icon('plus')}</button></div></div><div class="qb-main" aria-live="polite"></div></div><div class="qb-island"></div><div class="qb-dock" role="tablist" aria-label="底部导航"><div class="qb-lens" aria-hidden="true"></div>${[['overview','layout-grid','总览'],['connections','link-2','连接'],['settings','sliders-horizontal','设置']].map(([id,glyph,name])=>`<button type="button" role="tab" class="qb-nav cursor-interaction" data-page="${id}" aria-selected="${id==='overview'}">${icon(glyph)}${name}</button>`).join('')}</div><div class="qb-home"></div></div><div class="qb-desktop"><img src="${src}" alt="${brand.name}桌面图标"/><span>${brand.name}<br/>主屏幕尺寸</span><span class="qb-size"><img class="qb-small" src="${src}" alt="${brand.name}小尺寸图标"/>小尺寸</span></div>`;
+    page(stage, 'overview', false);
+    stage.addEventListener('click', event => {
+      const target = event.target.closest('button'); if (!target) return;
+      if (target.dataset.page) page(stage,target.dataset.page);
+      if (target.dataset.action === 'detail') {
+        const main = stage.querySelector('.qb-main');
+        main.innerHTML = `<div class="qb-page-title">Pro 工作站</div><div class="qb-label">每周额度 · 剩余</div><div class="qb-amount" style="margin-block:12px 22px">$594.57</div><div class="qb-meter"><span></span></div><div class="qb-row"><span>今日实际消耗</span><span>$5.43</span></div><div class="qb-row"><span>总额度</span><span>$600.00</span></div><div class="qb-row"><span>余量记录</span><span>每日快照 · 演示</span></div>`;
+      }
+      if (target.dataset.action === 'refresh') { const label = stage.querySelector('.qb-list small'); if(label) label.textContent = '● 已刷新 · 演示'; }
+    });
+  });
+  function render() {
+    root.querySelectorAll('.qb-phone').forEach(phone => {
+      phone.style.colorScheme = state.appearance === '浅色' ? 'light' : state.appearance === '深色' ? 'dark' : 'light dark';
+      phone.querySelector('.qb-lens').style.transitionDuration = state.motion ? '' : '0ms';
+    });
+  }
+  function remember() { window.openai?.setWidgetState({ modelContent: { style: '通透磨砂', dock: '滑动玻璃透镜' }, privateContent: { appearance: state.appearance, motion: state.motion } }).catch(() => {}); }
+  render();
+  if (globalThis.Tweak) {
+    const tweak = new Tweak({ container: root, onChange: () => { render(); remember(); } });
+    tweak.addSelect(state,'appearance',{ label:'预览外观', options:['跟随系统','浅色','深色'] });
+    tweak.addToggle(state,'motion',{ label:'玻璃透镜动效' });
+  }
+  window.addEventListener('openai:set_globals', event => {
+    const next = event.detail?.globals?.widgetState?.privateContent; if(!next) return;
+    if(['跟随系统','浅色','深色'].includes(next.appearance)) state.appearance=next.appearance;
+    if(typeof next.motion==='boolean') state.motion=next.motion;
+    render();
+  });
+})();
+</script>

@@ -7,19 +7,19 @@ const OverviewLayout = (props: WidgetData, environment: WidgetEnvironment) => {
   'widget';
   const dark = environment.colorScheme === 'dark';
   const monochrome = environment.widgetRenderingMode !== 'fullColor';
-  const ink = monochrome ? { type: 'hierarchical' as const, style: 'primary' as const } : dark ? '#E8F1FC' : '#142D46';
-  const muted = monochrome ? { type: 'hierarchical' as const, style: 'secondary' as const } : dark ? '#9BAFC4' : '#65788C';
+  const ink = monochrome ? { type: 'hierarchical' as const, style: 'primary' as const } : dark ? '#F0F5F1' : '#18363C';
+  const muted = monochrome ? { type: 'hierarchical' as const, style: 'secondary' as const } : dark ? '#C3D3CC' : '#405D62';
   const accounts = props.accounts.slice(0, 3);
   return <VStack alignment="leading" spacing={10} modifiers={[
     frame({ maxWidth: Infinity, maxHeight: Infinity, alignment: 'topLeading' }),
-    containerBackground({ type: 'linearGradient', colors: dark ? ['#192D46', '#132F36'] : ['#F5F9FF', '#EDF6F4'], startPoint: { x: 0, y: 0 }, endPoint: { x: 1, y: 1 } }, 'widget'),
+    containerBackground({ type: 'linearGradient', colors: dark ? ['#34484D', '#293B29'] : ['#DAE9E4', '#C8D2B3'], startPoint: { x: 0, y: 0 }, endPoint: { x: 1, y: 1 } }, 'widget'),
     widgetURL('quotadeck:///'), privacySensitive(),
   ]}>
     <HStack><Text modifiers={[font({ size: 12, weight: 'semibold' }), foregroundStyle(ink)]}>余量</Text><Spacer /><Text modifiers={[font({ size: 9 }), foregroundStyle(muted)]}>常用账号 · {props.accounts.length}</Text></HStack>
     <Spacer />
     {accounts.length ? <HStack alignment="top" spacing={18}>{accounts.map(account => {
       const metric = account.metrics[0];
-      const color = metric?.stale ? muted : metric?.percent != null && metric.percent <= props.threshold ? '#C88D37' : dark ? '#82AEFF' : '#3078EA';
+      const color = metric?.stale ? muted : metric?.percent != null && metric.percent <= props.threshold ? dark ? '#F1CF94' : '#815618' : dark ? '#B8DAC1' : '#256D5E';
       return <Link key={account.id} destination={account.url} modifiers={[frame({ maxWidth: Infinity })]}>
         <VStack alignment="leading" spacing={7}>
           <Text modifiers={[font({ size: 10, weight: 'medium' }), foregroundStyle(ink), lineLimit(1)]}>{account.name}</Text>

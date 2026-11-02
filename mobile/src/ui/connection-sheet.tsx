@@ -92,7 +92,7 @@ export function ConnectionSheet({ controller, existing, onClose }: { controller:
         {kinds.map(item => <Pressable key={item} accessibilityRole="button" accessibilityState={{ selected: kind === item }} disabled={busy || saving}
           onPress={() => { edit(setKind)(item); if (!baseUrl && item === 'deepseek') setBaseUrl('https://api.deepseek.com'); if (!baseUrl && item === 'openrouter') setBaseUrl('https://openrouter.ai'); }}
           style={{ paddingHorizontal: 13, paddingVertical: 11, borderRadius: 13, backgroundColor: kind === item ? t.accent : t.input }}>
-          <Text style={{ color: kind === item ? (t.dark ? '#10243B' : '#FFFFFF') : t.secondary, fontSize: 12, fontWeight: kind === item ? '600' : '400' }}>{PROVIDER_LABELS[item]}</Text>
+          <Text style={{ color: kind === item ? t.accentForeground : t.secondary, fontSize: 12, fontWeight: kind === item ? '600' : '400' }}>{PROVIDER_LABELS[item]}</Text>
         </Pressable>)}
       </View>
     </View> : <Chip label={PROVIDER_LABELS[kind]} icon={Link2} />}

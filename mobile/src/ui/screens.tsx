@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ArrowRight, ChevronRight, FlaskConical, LayoutGrid, Link2, Plus, RefreshCw, Settings2, ShieldCheck } from 'lucide-react-native';
+import { ArrowRight, ChevronRight, FlaskConical, Link2, Plus, RefreshCw, ShieldCheck } from 'lucide-react-native';
 import { PROVIDER_LABELS, type Source } from '../domain/types';
 import { attention, hostLabel, isSampleStale } from '../domain/format';
 import type { QuotaController } from '../state/useQuota';
@@ -12,7 +12,8 @@ import { SourceCard, ProviderMark } from './source-card';
 import { ConnectionSheet } from './connection-sheet';
 import { DetailSheet } from './detail-sheet';
 import { Settings } from './settings';
-import { radius, useTheme } from './theme';
+import { useTheme } from './theme';
+import { Ambient } from './ambient';
 
 type Tab = 'overview' | 'connections' | 'settings';
 
@@ -33,13 +34,9 @@ export function Deck({ controller, tab }: { controller: QuotaController; tab: Ta
   const add = () => { tap(data.preferences.haptics); setConnection({}); };
   const refresh = async () => { setRefreshing(true); try { await controller.refreshAll(); } finally { setRefreshing(false); } };
   const bottom = Math.max(insets.bottom, Platform.OS === 'web' ? 20 : 10);
-  const chooseTab = (value: Tab) => { tap(data.preferences.haptics); router.replace(value === 'overview' ? '/' : value === 'connections' ? '/connections' : '/settings'); };
 
   return <LinearGradient colors={t.backdrop} style={{ flex: 1 }}>
-    <View pointerEvents="none" style={[StyleSheet.absoluteFill, { overflow: 'hidden' }]}>
-      <View style={{ position: 'absolute', top: 40, right: -140, width: 330, height: 330, borderRadius: 200, backgroundColor: t.dark ? '#1F4E7040' : '#B6DAFC35' }} />
-      <View style={{ position: 'absolute', top: 410, left: -180, width: 320, height: 320, borderRadius: 200, backgroundColor: t.dark ? '#19554C22' : '#CBE9DC33' }} />
-    </View>
+    <Ambient />
     <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled"
       refreshControl={tab !== 'settings' ? <RefreshControl refreshing={refreshing} onRefresh={() => void refresh()} tintColor={t.accent} colors={[t.accent]} /> : undefined}
       contentContainerStyle={{ paddingTop: insets.top + 20, paddingBottom: 112 + bottom, paddingHorizontal: 22, width: '100%', maxWidth: 560, alignSelf: 'center', gap: 20 }}>
@@ -62,9 +59,9 @@ export function Deck({ controller, tab }: { controller: QuotaController; tab: Ta
           <Text style={{ color: t.secondary, fontSize: 12, lineHeight: 20 }}>分散的 API 额度，此刻尽在掌握。</Text>
         </View>
         {sources.length ? <>
-          <Glass subtle style={{ paddingVertical: 16, borderRadius: radius.card }}><View style={{ flexDirection: 'row' }}>
+          <View style={{ paddingVertical: 18, borderTopWidth: 1, borderBottomWidth: 1, borderColor: t.line, flexDirection: 'row' }}>
             <Stat value={sources.length} title="监控账号" color={t.ink} /><Stat value={healthy} title="状态正常" color={t.mint} divider /><Stat value={needsAttention} title="需要留意" color={needsAttention ? t.amber : t.ink} divider />
-          </View></Glass>
+          </View>
           <View style={[styles.between, { marginTop: 1 }]}>
             <View style={{ flexDirection: 'row', gap: 18 }}>{(['all', 'pinned'] as const).map(value => <Pressable key={value} onPress={() => setFilter(value)} accessibilityRole="button" accessibilityState={{ selected: filter === value }} style={{ paddingVertical: 5 }}>
               <Text style={{ fontSize: 13, fontWeight: filter === value ? '700' : '400', color: filter === value ? t.ink : t.muted }}>{value === 'all' ? '全部额度' : '已置顶'}{value === 'all' ? `  ${sources.length}` : ''}</Text>
@@ -74,7 +71,7 @@ export function Deck({ controller, tab }: { controller: QuotaController; tab: Ta
           <View style={{ gap: 15, marginTop: -7 }}>{sources.filter(source => filter === 'all' || source.pinned).map(source => <SourceCard key={source.id} source={source} state={data.states[source.id]} threshold={data.preferences.lowThreshold} onPress={() => { tap(data.preferences.haptics); setDetailId(source.id); }} />)}
             {filter === 'pinned' && !sources.some(source => source.pinned) ? <Text style={{ color: t.secondary, textAlign: 'center', padding: 35, fontSize: 12 }}>在额度详情中置顶常用账号</Text> : null}
           </View>
-          <Pressable accessibilityRole="button" onPress={add} style={[styles.row, { justifyContent: 'center', gap: 8, borderWidth: 1, borderStyle: 'dashed', borderColor: t.dark ? '#3A536D' : '#C6D5E6', borderRadius: 21, paddingVertical: 19 }]}>
+          <Pressable accessibilityRole="button" onPress={add} style={[styles.row, { justifyContent: 'center', gap: 8, borderWidth: 1, borderStyle: 'dashed', borderColor: t.line, borderRadius: 21, paddingVertical: 19 }]}>
             <Plus size={16} color={t.secondary} /><Text style={{ color: t.secondary, fontSize: 12 }}>再连接一个站点</Text>
           </Pressable>
           <Text style={{ color: t.muted, fontSize: 9, textAlign: 'center', letterSpacing: .3 }}>你的连接，只在你的设备上。</Text>
@@ -92,14 +89,6 @@ export function Deck({ controller, tab }: { controller: QuotaController; tab: Ta
         <Glass subtle style={{ padding: 20, gap: 10 }}><View style={[styles.row, { gap: 8 }]}><Link2 size={17} color={t.accent} /><Text style={{ color: t.ink, fontSize: 13, fontWeight: '600' }}>为不同接口，留好位置</Text></View><Text style={{ color: t.secondary, fontSize: 11, lineHeight: 21 }}>Sub2API 套餐与反代、New API、One API、OpenRouter、DeepSeek，以及自定义余额接口。</Text></Glass>
       </> : <Settings controller={controller} />}
     </ScrollView>
-    <View pointerEvents="box-none" style={{ position: 'absolute', bottom, left: 22, right: 22, alignItems: 'center' }}>
-      <Glass style={{ flexDirection: 'row', width: '100%', maxWidth: 400, borderRadius: radius.dock, padding: 6, backgroundColor: t.dock, boxShadow: t.dark ? '0px 8px 30px rgba(0,0,0,0.3)' : '0px 10px 35px rgba(30,66,110,0.12)' }}>
-        {([{ id: 'overview', label: '总览', icon: LayoutGrid }, { id: 'connections', label: '连接', icon: Link2 }, { id: 'settings', label: '设置', icon: Settings2 }] as const).map(item => <Pressable key={item.id} accessibilityRole="tab" accessibilityLabel={item.label} accessibilityState={{ selected: tab === item.id }} onPress={() => chooseTab(item.id)}
-          style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 5, minHeight: 53, borderRadius: 20, borderCurve: 'continuous', backgroundColor: tab === item.id ? t.accentSoft : 'transparent' }}>
-          <item.icon size={19} color={tab === item.id ? t.accent : t.secondary} strokeWidth={tab === item.id ? 2 : 1.65} /><Text style={{ fontSize: 10, fontWeight: tab === item.id ? '600' : '400', color: tab === item.id ? t.accent : t.secondary }}>{item.label}</Text>
-        </Pressable>)}
-      </Glass>
-    </View>
     {connection ? <ConnectionSheet controller={controller} existing={connection.existing} onClose={() => setConnection(undefined)} /> : null}
     {detail && !connection ? <DetailSheet source={detail} controller={controller} onClose={closeDetail} onReconnect={source => { closeDetail(); setConnection({ existing: source }); }} /> : null}
   </LinearGradient>;
@@ -116,8 +105,8 @@ function Stat({ value, title, color, divider }: { value: number; title: string; 
 function EmptyState({ onAdd, onDemo }: { onAdd: () => void; onDemo: () => void }) {
   const t = useTheme(); return <Glass style={{ padding: 27, paddingTop: 38, paddingBottom: 30, gap: 23, alignItems: 'center', marginTop: 2 }}>
     <View style={{ width: 112, height: 112, alignItems: 'center', justifyContent: 'center' }}>
-      <View style={{ position: 'absolute', width: 110, height: 110, borderWidth: 1, borderColor: t.dark ? '#344F6B' : '#E1EAF7', borderRadius: 55 }} />
-      <View style={{ position: 'absolute', width: 80, height: 80, borderWidth: 1, borderColor: t.dark ? '#344F6B' : '#E1EAF7', borderRadius: 40 }} />
+      <View style={{ position: 'absolute', width: 110, height: 110, borderWidth: 1, borderColor: t.line, borderRadius: 55 }} />
+      <View style={{ position: 'absolute', width: 80, height: 80, borderWidth: 1, borderColor: t.line, borderRadius: 40 }} />
       <Logo size={54} /><View style={{ position: 'absolute', right: 0, top: 9, width: 24, height: 24, borderRadius: 9, backgroundColor: t.mintSoft, alignItems: 'center', justifyContent: 'center' }}><Plus size={13} color={t.mint} /></View>
     </View>
     <View style={{ gap: 10, alignItems: 'center' }}><Text style={{ color: t.ink, fontSize: 20, fontWeight: '600', letterSpacing: -.5 }}>给你的额度，一个家。</Text><Text style={{ color: t.secondary, fontSize: 12, lineHeight: 22, textAlign: 'center' }}>连接常用的反代或 API 站点，{'\n'}余量、用量和重置时间，打开就能看见。</Text></View>

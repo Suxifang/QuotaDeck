@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>余见 · 透光视窗</title>
+  <defs>
+    <linearGradient id="base" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#B0C9D4"/><stop offset=".5" stop-color="#72959D"/><stop offset="1" stop-color="#476C77"/></linearGradient>
+    <radialGradient id="light" cx=".1" cy="0" r="1"><stop stop-color="#F2FFFF" stop-opacity=".62"/><stop offset="1" stop-color="#F2FFFF" stop-opacity="0"/></radialGradient>
+    <linearGradient id="mark" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#DCECEE"/></linearGradient>
+    <filter id="shadow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="12" stdDeviation="13" flood-color="#284C57" flood-opacity=".14"/></filter>
+  </defs>
+  <path fill="url(#base)" d="M0 0h1024v1024H0z"/>
+  <path fill="url(#light)" d="M0 0h1024v1024H0z"/>
+  <g filter="url(#shadow)">
+    <path d="M230 512c132-226 432-226 564 0-132 226-432 226-564 0Z" fill="url(#mark)" fill-opacity=".18" stroke="url(#mark)" stroke-width="58" stroke-linejoin="round"/>
+    <circle cx="512" cy="512" r="89" fill="url(#mark)"/>
+  </g>
+</svg>

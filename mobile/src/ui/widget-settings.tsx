@@ -14,7 +14,7 @@ export function WidgetSettings({ controller }: { controller: QuotaController }) 
   const focus = focusAccount(preview);
   const metric = focus?.metrics[0];
   const tint = metric?.percent != null && metric.percent <= preview.threshold ? t.amber : t.accent;
-  const backgrounds = t.dark ? ['#1D3551', '#17343E'] as const : ['#F8FBFF', '#EDF6F4'] as const;
+  const backgrounds = t.dark ? ['#34484D', '#293B29'] as const : ['#DAE9E4', '#C8D2B3'] as const;
   return <>
     <View style={{ gap: 9 }}><Text style={{ fontSize: 24, fontWeight: '600', letterSpacing: -.8, color: t.ink }}>抬眼，心中有数。</Text>
       <Text style={{ color: t.secondary, fontSize: 12, lineHeight: 21 }}>把常用账号放在桌面，也可以留在锁屏。{controller.isDemo ? '下方为演示预览。' : ''}</Text></View>

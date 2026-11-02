@@ -12,8 +12,8 @@ export function Meter({ metric, threshold = 20 }: { metric: QuotaMetric; thresho
   const t = useTheme(); const percent = percentRemaining(metric);
   if (percent === undefined) return null;
   const low = percent <= threshold;
-  return <View accessibilityLabel={`${metric.label}剩余 ${Math.round(percent)}%`} style={{ height: 6, borderRadius: 4, overflow: 'hidden', backgroundColor: t.dark ? '#33485D' : '#E8EEF5' }}>
-    <LinearGradient colors={low ? ['#E2A158', '#EDC28C'] : ['#467FE8', '#85B7F4']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+  return <View accessibilityLabel={`${metric.label}剩余 ${Math.round(percent)}%`} style={{ height: 5, borderRadius: 4, overflow: 'hidden', backgroundColor: t.track }}>
+    <LinearGradient colors={low ? t.meterLow : t.meter} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
       style={{ height: '100%', width: `${percent}%`, borderRadius: 4 }} />
   </View>;
 }
@@ -24,7 +24,7 @@ export function ProviderMark({ source, size = 40 }: { source: Source; size?: num
   const admin = kind === 'sub2-admin';
   const Icon = admin ? Network : kind === 'sub2api' ? Layers3 : kind === 'newapi' || kind === 'oneapi' ? Wallet : Sparkles;
   return <View style={{ width: size, height: size, borderRadius: size * .28, borderCurve: 'continuous', alignItems: 'center', justifyContent: 'center',
-    backgroundColor: admin ? t.mintSoft : t.accentSoft, borderWidth: 1, borderColor: admin ? (t.dark ? '#345952' : '#D4ECE5') : (t.dark ? '#314969' : '#DBE8FD') }}>
+    backgroundColor: admin ? t.mintSoft : t.accentSoft }}>
     <Icon color={admin ? t.mint : t.accent} size={size * .48} strokeWidth={1.75} />
   </View>;
 }
@@ -36,7 +36,6 @@ export function SourceCard({ source, state, threshold, onPress }: { source: Sour
   return <Pressable accessibilityRole="button" accessibilityLabel={`查看${source.name}额度详情`} onPress={onPress}
     style={({ pressed }) => ({ opacity: source.enabled ? pressed ? .84 : 1 : .55, transform: [{ scale: pressed ? .992 : 1 }] })}>
     <Glass style={{ padding: 21, gap: 16 }}>
-      {source.pinned && !t.dark ? <LinearGradient pointerEvents="none" colors={['rgba(225,238,255,0.32)', 'rgba(255,255,255,0)']} style={{ position: 'absolute', left: 0, top: 0, right: 0, height: 150 }} /> : null}
       <View style={[styles.between, { gap: 10 }]}>
         <View style={[styles.row, { gap: 11, flex: 1 }]}><ProviderMark source={source} />
           <View style={{ flex: 1 }}><Text numberOfLines={1} style={{ color: t.ink, fontSize: 15, fontWeight: '700', letterSpacing: -.25 }}>{source.name}</Text>

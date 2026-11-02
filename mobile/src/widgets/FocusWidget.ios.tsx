@@ -14,9 +14,9 @@ const FocusLayout = (props: WidgetData, environment: WidgetEnvironment<Configura
   const accessory = environment.widgetFamily === 'accessoryRectangular';
   const dark = environment.colorScheme === 'dark';
   const monochrome = environment.widgetRenderingMode !== 'fullColor';
-  const ink = monochrome ? { type: 'hierarchical' as const, style: 'primary' as const } : dark ? '#E8F1FC' : '#142D46';
-  const muted = monochrome ? { type: 'hierarchical' as const, style: 'secondary' as const } : dark ? '#9BAFC4' : '#65788C';
-  const color = metric?.stale ? muted : metric?.percent != null && metric.percent <= props.threshold ? '#C88D37' : dark ? '#82AEFF' : '#3078EA';
+  const ink = monochrome ? { type: 'hierarchical' as const, style: 'primary' as const } : dark ? '#F0F5F1' : '#18363C';
+  const muted = monochrome ? { type: 'hierarchical' as const, style: 'secondary' as const } : dark ? '#C3D3CC' : '#405D62';
+  const color = metric?.stale ? muted : metric?.percent != null && metric.percent <= props.threshold ? dark ? '#F1CF94' : '#815618' : dark ? '#B8DAC1' : '#256D5E';
   if (accessory) {
     return <VStack alignment="leading" spacing={3} modifiers={[widgetURL(account?.url ?? 'quotadeck:///'), privacySensitive()]}>
       <Text modifiers={[font({ size: 11, weight: 'medium' }), lineLimit(1)]}>{account?.name ?? '余量'}</Text>
@@ -26,7 +26,7 @@ const FocusLayout = (props: WidgetData, environment: WidgetEnvironment<Configura
   }
   return <VStack alignment="leading" spacing={4} modifiers={[
     frame({ maxWidth: Infinity, maxHeight: Infinity, alignment: 'topLeading' }),
-    containerBackground({ type: 'linearGradient', colors: dark ? ['#192D46', '#132638'] : ['#F6FAFF', '#EAF3FC'], startPoint: { x: 0, y: 0 }, endPoint: { x: 1, y: 1 } }, 'widget'),
+    containerBackground({ type: 'linearGradient', colors: dark ? ['#34484D', '#293B29'] : ['#DAE9E4', '#C8D2B3'], startPoint: { x: 0, y: 0 }, endPoint: { x: 1, y: 1 } }, 'widget'),
     widgetURL(account?.url ?? 'quotadeck:///'), privacySensitive(),
   ]}>
     <HStack spacing={5}>

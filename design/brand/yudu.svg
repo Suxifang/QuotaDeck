@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>余度 · 留白刻度</title>
+  <defs>
+    <linearGradient id="base" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#91B8B8"/><stop offset=".52" stop-color="#547E72"/><stop offset="1" stop-color="#7F9365"/></linearGradient>
+    <radialGradient id="light" cx=".08" cy="0" r="1"><stop stop-color="#F1FFF7" stop-opacity=".56"/><stop offset="1" stop-color="#F1FFF7" stop-opacity="0"/></radialGradient>
+    <linearGradient id="mark" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#DEECE0"/></linearGradient>
+    <filter id="shadow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="12" stdDeviation="13" flood-color="#1F463D" flood-opacity=".14"/></filter>
+  </defs>
+  <path fill="url(#base)" d="M0 0h1024v1024H0z"/>
+  <path fill="url(#light)" d="M0 0h1024v1024H0z"/>
+  <g filter="url(#shadow)" fill="none" stroke="url(#mark)" stroke-width="88" stroke-linecap="round">
+    <path d="M661 299a260 260 0 1 0 87 323"/>
+    <path d="m748 374 30 67"/>
+  </g>
+</svg>

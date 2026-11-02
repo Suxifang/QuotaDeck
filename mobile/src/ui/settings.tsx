@@ -71,7 +71,7 @@ export function Settings({ controller }: { controller: QuotaController }) {
     {info ? <Sheet visible title={info === 'privacy' ? '数据与隐私' : info === 'credits' ? '开源致谢' : info === 'widgets' ? '桌面与锁屏' : info === 'updates' ? '软件更新' : '清空余量记录'} onClose={() => setInfo(undefined)}>
       {info === 'updates' ? <UpdateSettings /> : info === 'widgets' ? <WidgetSettings controller={controller} /> : info === 'privacy' ? <>
         <Info title="直接连接你的站点" text="应用从手机直接查询你添加的接口。没有余度中转服务器，不需要注册账号。" />
-        <Info title="凭据留在本机" text="iOS 密钥与登录状态保存在系统钥匙串，设备解锁后可读；后台密码仅用于登录。网页预览的凭据只保留在当前页面内存中。" />
+        <Info title="凭据留在本机" text="iOS 密钥与登录状态保存在系统钥匙串，设备解锁后可读；站点密码仅用于本次登录，不落盘。套餐记录的登录状态与额度 API Key 分别保存，导出不含二者；重新连接或移除站点会清理记录登录状态。网页预览的凭据只保留在当前页面内存中。" />
         <Info title="记录与导出" text="站点配置、最近成功额度及每天最后一条余量保存在本机，余量记录最多保留 90 天。逐次使用记录从站点读取，仅保留在当前详情页内存中，关闭后释放；不保存请求内容或 IP。导出配置不含凭据，也不含额度和使用记录。" />
         <Info title="小组件" text="小组件与应用共享账号显示名称及最近额度，不共享密钥、登录状态或站点地址。演示数据只供应用内预览，不会写入小组件。" />
         <Info title="版本更新" text="检查更新会向 GitHub 公开发行仓库请求版本信息，不携带站点配置或密钥。下载的 IPA 缓存在本机，签名和安装由你在 LCSign 中确认。" />

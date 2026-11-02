@@ -4,24 +4,27 @@ import { ArrowDown, ArrowUp, ChevronDown, ChevronLeft, ChevronRight, Clock3, Lis
 import type { Source, UsageRecord } from '../domain/types';
 import { duration, tokenCount, usageCost, usageDay, usageTime } from '../domain/usage-format';
 import type { UsageRecordsState } from '../state/useUsageRecords';
+import type { QuotaController } from '../state/useQuota';
 import { Button, Glass, IconButton, styles } from './primitives';
 import { useTheme } from './theme';
+import { UsageLogin } from './usage-login';
 
-export function UsageRecords({ source, state, onReconnect }: { source: Source; state: UsageRecordsState; onReconnect: () => void }) {
+export function UsageRecords({ source, state, onReconnect, connectUsage }: { source: Source; state: UsageRecordsState; onReconnect: () => void; connectUsage: QuotaController['connectUsage'] }) {
   const t = useTheme();
   const [expanded, setExpanded] = useState<{ id: string; revision: string }>();
   const revision = `${state.page}:${state.result?.fetchedAt}`;
   const reconnect = state.error?.code === 'AUTH' || state.error?.code === 'FORBIDDEN';
   const unsupported = state.error?.code === 'UNSUPPORTED';
+  const userLogin = reconnect && (source.resolvedKind ?? source.kind) === 'sub2api';
   return <>
     <View style={[styles.between, { gap: 12 }]}>
       <View style={{ flex: 1, gap: 6 }}>
         <Text style={{ color: t.ink, fontSize: 23, fontWeight: '600', letterSpacing: -.6 }}>最近使用</Text>
-        <Text style={{ color: t.secondary, fontSize: 11, lineHeight: 18 }}>{source.accountId ? `仅上游账号 #${source.accountId} · 最新在前` : '仅当前密钥 · 最新在前'}</Text>
+        <Text style={{ color: t.secondary, fontSize: 11, lineHeight: 18 }}>{(source.resolvedKind ?? source.kind) === 'sub2-admin' && source.accountId ? `仅上游账号 #${source.accountId} · 最新在前` : '仅当前密钥 · 最新在前'}</Text>
       </View>
       {state.loading ? <ActivityIndicator color={t.accent} style={{ width: 38, height: 38 }} /> : <IconButton icon={RefreshCw} label="刷新使用记录" size={38} onPress={state.refresh} />}
     </View>
-    {state.error ? <Glass subtle style={{ padding: 18, gap: 12, borderRadius: 20 }}>
+    {userLogin ? <UsageLogin sourceId={source.id} connect={connectUsage} onConnected={state.refresh} /> : state.error ? <Glass subtle style={{ padding: 18, gap: 12, borderRadius: 20 }}>
       <View style={[styles.row, { gap: 8 }]}><ListFilter size={17} color={t.amber} /><Text style={{ color: t.ink, fontSize: 14, fontWeight: '600' }}>{unsupported ? '此连接暂不支持记录' : '使用记录暂未更新'}</Text></View>
       <Text accessibilityRole="alert" style={{ color: t.secondary, fontSize: 12, lineHeight: 21 }}>{state.error.message}</Text>
       {state.result ? <Text style={{ color: t.muted, fontSize: 10 }}>下方仍是上次成功读取的记录。</Text> : null}

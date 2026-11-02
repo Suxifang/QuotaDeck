@@ -6,6 +6,7 @@ import plistlib
 import re
 import sys
 import zipfile
+from ipa_entitlements import read_entitlements
 
 
 def validate_ipa(path, version, build):
@@ -37,8 +38,16 @@ def validate_ipa(path, version, build):
         executable = widgets[0].removesuffix('Info.plist') + widget['CFBundleExecutable']
         if executable not in names or not package.getinfo(executable).file_size:
             raise RuntimeError('Widget executable is missing')
+        group = 'group.app.quotadeck.mobile'
+        for label, target, program in [('Application', info, app + info['CFBundleExecutable']), ('Widget', widget, executable)]:
+            if target.get('ExpoWidgetsAppGroupIdentifier') != group:
+                raise RuntimeError(f'{label} shared group Info.plist is missing or changed')
+            entitlements = read_entitlements(package.read(program))
+            if group not in entitlements.get('com.apple.security.application-groups', []):
+                raise RuntimeError(f'{label} executable is missing the embedded App Group entitlement needed by re-signing tools')
     return {'version': version, 'build': str(build), 'bundleId': info['CFBundleIdentifier'], 'displayName': info['CFBundleDisplayName'],
-            'widgetBundleId': widget['CFBundleIdentifier'], 'bytes': path.stat().st_size, 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
+            'widgetBundleId': widget['CFBundleIdentifier'], 'appGroup': group, 'embeddedGroupEntitlements': True,
+            'bytes': path.stat().st_size, 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
 
 
 if __name__ == '__main__':

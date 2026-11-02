@@ -10,6 +10,7 @@ import { radius, useTheme } from './theme';
 export function WidgetSettings({ controller }: { controller: QuotaController }) {
   const t = useTheme();
   const [choosing, setChoosing] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const preview = widgetData(controller.data);
   const focus = focusAccount(preview);
   const metric = focus?.metrics[0];
@@ -18,17 +19,29 @@ export function WidgetSettings({ controller }: { controller: QuotaController }) 
   const realAccounts = controller.saved.sources.filter(source => source.enabled).length;
   const sync = controller.widgetSyncResult;
   return <>
-    <View style={{ gap: 9 }}><Text style={{ fontSize: 24, fontWeight: '600', letterSpacing: -.8, color: t.ink }}>抬眼，心中有数。</Text>
-      <Text style={{ color: t.secondary, fontSize: 12, lineHeight: 21 }}>把常用账号放在桌面，也可以留在锁屏。{controller.isDemo ? '下方为演示预览。' : ''}</Text></View>
+    <View style={{ gap: 9 }}><Text style={{ fontSize: 24, fontWeight: '600', letterSpacing: -.8, color: t.ink }}>桌面上，也能看额度。</Text>
+      <Text style={{ color: t.secondary, fontSize: 12, lineHeight: 21 }}>无需置顶，选择账号后同步即可。{controller.isDemo ? '演示账号仅用于应用内预览。' : ''}</Text></View>
     <Glass subtle style={{ padding: 18, gap: 13 }}>
       <View style={styles.between}><Text style={{ color: t.ink, fontSize: 14, fontWeight: '600' }}>让桌面显示额度</Text><Text style={{ color: t.secondary, fontSize: 11 }}>可同步账号 · {realAccounts}</Text></View>
-      <Text style={{ color: t.secondary, fontSize: 12, lineHeight: 21 }}>{!realAccounts ? '先在“连接”中添加真实站点并启用账号，再返回这里同步。演示账号只供应用内预览，桌面会保持空白。' : '账号已就绪。同步后，小组件会显示最近一次查询的余量；置顶账号会优先显示。'}</Text>
+      <Text style={{ color: t.secondary, fontSize: 12, lineHeight: 21 }}>{!realAccounts ? '先添加并启用真实连接，再同步到桌面。' : '显示最近一次查询的余量，应用查询后会自动同步。'}</Text>
+      <Pressable accessibilityRole="button" accessibilityLabel="选择小组件账号" accessibilityState={{ expanded: choosing }} disabled={controller.isDemo || !realAccounts} onPress={() => setChoosing(value => !value)} style={[styles.between, { gap: 8, paddingVertical: 8 }]}>
+        <View style={{ flex: 1, gap: 5 }}><Text style={{ color: t.ink, fontSize: 13, fontWeight: '600' }}>关注账号</Text><Text numberOfLines={1} style={{ color: t.secondary, fontSize: 11 }}>{preview.accounts.find(account => account.id === preview.focusId)?.name ?? '自动选择 · 优先置顶账号'}</Text></View><ChevronDown size={16} color={t.secondary} />
+      </Pressable>
+      {choosing ? [{ id: '', name: '自动选择 · 优先置顶' }, ...preview.accounts].map(account => <Pressable key={account.id} accessibilityRole="radio" accessibilityLabel={account.name} accessibilityState={{ selected: (preview.focusId ?? '') === account.id }}
+        onPress={() => { controller.changePreferences({ widgetSourceId: account.id }); setChoosing(false); }} style={[styles.between, { minHeight: 44, borderTopWidth: 1, borderColor: t.line }]}>
+        <Text style={{ color: t.ink, fontSize: 12, flex: 1 }}>{account.name}</Text>{(preview.focusId ?? '') === account.id ? <Check size={16} color={t.accent} /> : null}
+      </Pressable>) : null}
       {Platform.OS === 'ios' ? <>
         <Button title={controller.widgetSyncing ? '正在同步…' : '立即同步到小组件'} icon={RefreshCw} loading={controller.widgetSyncing} disabled={!controller.ready} onPress={() => void controller.publishWidgets(true)} />
         {controller.widgetError ? <Text accessibilityRole="alert" style={{ color: t.amber, fontSize: 12, lineHeight: 21 }}>{controller.widgetError}</Text> : sync?.supported ? <Text accessibilityLiveRegion="polite" style={{ color: t.secondary, fontSize: 11, lineHeight: 20 }}>已写入 {sync.accountCount} 个账号 · {new Date(sync.syncedAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}。桌面显示由系统刷新，可能稍有延迟。</Text> : null}
-        <Text style={{ color: t.muted, fontSize: 11, lineHeight: 20 }}>如果仍显示“常用账号 · 0”，先打开应用完成查询并同步，再移除桌面旧卡片后重新添加；若仍无数据，需检查自签时主应用与小组件的共享权限是否一致。</Text>
+        {controller.widgetError ? <Text style={{ color: t.muted, fontSize: 11, lineHeight: 20 }}>签名时保留小组件扩展和相同的 App Group，证书也须允许该共享组。仅在应用里置顶或反复同步，无法补上签名权限。</Text> : null}
       </> : <Text style={{ color: t.muted, fontSize: 11 }}>桌面同步需要在已安装的 iPhone 应用内操作。</Text>}
     </Glass>
+    <Pressable accessibilityRole="button" accessibilityLabel="预览小组件外观" accessibilityState={{ expanded: showPreview }} onPress={() => setShowPreview(value => !value)} style={[styles.between, { paddingVertical: 8 }]}>
+      <Text style={{ color: t.ink, fontSize: 13, fontWeight: '600' }}>预览小组件外观</Text><ChevronDown size={16} color={t.secondary} style={{ transform: [{ rotate: showPreview ? '180deg' : '0deg' }] }} />
+    </Pressable>
+    {showPreview ? <>
+    <Text style={{ color: t.muted, fontSize: 10 }}>下方仅为应用内预览，不代表桌面已经同步。</Text>
     <View style={{ alignItems: 'center', paddingVertical: 8, gap: 12 }}>
       <LinearGradient colors={backgrounds} style={{ width: 164, height: 164, padding: 17, borderRadius: 24, borderCurve: 'continuous', borderWidth: 1, borderColor: t.border, boxShadow: '0px 12px 30px rgba(23,60,100,.10)' }}>
         <View style={styles.between}><Text numberOfLines={1} style={{ color: t.ink, fontSize: 11, fontWeight: '600', flex: 1 }}>{focus?.name ?? '余度'}</Text><ArrowUpRight size={12} color={t.muted} /></View>
@@ -52,16 +65,7 @@ export function WidgetSettings({ controller }: { controller: QuotaController }) 
       <Text style={{ color: t.muted, fontSize: 8 }}>最近一次查询 · 打开应用同步最新额度</Text>
     </LinearGradient>
     <Text style={{ color: t.muted, fontSize: 10, textAlign: 'center', marginTop: -9 }}>常用账号 · 中号 · 置顶优先</Text>
-    <Glass subtle style={{ padding: 17, gap: 12 }}>
-      <Pressable accessibilityRole="button" accessibilityLabel="选择小组件账号" disabled={controller.isDemo} onPress={() => setChoosing(value => !value)} style={[styles.between, { gap: 8 }]}>
-        <View style={{ flex: 1, gap: 5 }}><Text style={{ color: t.ink, fontSize: 13, fontWeight: '600' }}>关注账号</Text><Text numberOfLines={1} style={{ color: t.secondary, fontSize: 11 }}>{preview.accounts.find(account => account.id === preview.focusId)?.name ?? '自动选择 · 优先置顶账号'}</Text></View><ChevronDown size={16} color={t.secondary} />
-      </Pressable>
-      {choosing ? [{ id: '', name: '自动选择 · 优先置顶' }, ...preview.accounts].map(account => <Pressable key={account.id} accessibilityRole="radio" accessibilityLabel={account.name} accessibilityState={{ selected: preview.focusId === account.id }}
-        onPress={() => { controller.changePreferences({ widgetSourceId: account.id }); setChoosing(false); }} style={[styles.between, { paddingVertical: 8, borderTopWidth: 1, borderColor: t.line }]}>
-        <Text style={{ color: t.ink, fontSize: 12, flex: 1 }}>{account.name}</Text>{preview.focusId === account.id ? <Check size={16} color={t.accent} /> : null}
-      </Pressable>) : null}
-      <Text style={{ color: t.muted, fontSize: 10, lineHeight: 18 }}>在 iOS 17 及以上，也可以长按每个“关注账号”小组件，单独选择不同账号。已暂停的账号会从小组件移除。</Text>
-    </Glass>
+    </> : null}
     <View style={{ gap: 13 }}>
       <View style={[styles.row, { gap: 8 }]}><LayoutGrid size={16} color={t.accent} /><Text style={{ color: t.ink, fontSize: 13, fontWeight: '600' }}>添加到主屏幕</Text></View>
       <Text style={{ color: t.secondary, fontSize: 12, lineHeight: 22 }}>长按 iPhone 主屏幕空白处，选择“添加小组件”，搜索“余度”，选择小号或中号。</Text>

@@ -31,6 +31,10 @@ export function PageRail({ index, onSelect, children }: PageRailProps) {
       onPageSelected={event => { selected.current = event.nativeEvent.position; onSelect(event.nativeEvent.position); }}>
       {children}
     </AnimatedPager>
-    <LiquidDock index={index} progress={progress} onSelect={onSelect} />
+    <LiquidDock index={index} progress={progress} onSelect={next => {
+      selected.current = next;
+      pager.current?.setPageWithoutAnimation(next);
+      onSelect(next);
+    }} />
   </View>;
 }

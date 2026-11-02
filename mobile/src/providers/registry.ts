@@ -96,7 +96,7 @@ export async function loginAdmin(source: Source, email: string, password: string
   return sessionFromResponse(data);
 }
 
-function sessionFromResponse(data: Record<string, unknown>): Credential {
+export function sessionFromResponse(data: Record<string, unknown>): Credential {
   const accessToken = string(data.access_token);
   if (!accessToken) throw new QuotaError('AUTH', '后台未返回有效登录状态');
   const seconds = Math.min(nonnegative(data.expires_in) ?? 300, 86400);

@@ -20,7 +20,7 @@ export function createWidgetPublisher(bridge: {
   let pending = Promise.resolve();
   return (data: SavedData, force = false): Promise<WidgetSyncResult> => {
     const publish = async () => {
-      if (!bridge.available()) throw new Error('小组件共享空间不可用。请在 LCSign 中同时签署主应用与小组件，并保留二者相同的 App Group 权限后覆盖安装。');
+      if (!bridge.available()) throw new Error('当前安装无法访问小组件共享空间（App Group）。这与置顶无关，需要检查主应用与小组件的签名共享权限。');
       const timeline = widgetTimeline(data);
       const signature = signatureOf(timeline.map(entry => entry.props));
       if (!force && signature === lastSignature && lastResult) return lastResult;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
-import { ChevronRight, Clock3, CloudOff, Layers3, Network, Sparkles, Wallet } from 'lucide-react-native';
+import { ChevronRight, Clock3, CloudOff, Layers3, Network, Pin, PinOff, Sparkles, Wallet } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { QuotaMetric, Source, SourceState } from '../domain/types';
 import { PROVIDER_LABELS } from '../domain/types';
@@ -29,7 +29,7 @@ export function ProviderMark({ source, size = 40 }: { source: Source; size?: num
   </View>;
 }
 
-export function SourceCard({ source, state, threshold, onPress }: { source: Source; state?: SourceState; threshold: number; onPress: () => void }) {
+export function SourceCard({ source, state, threshold, onPress, onTogglePin }: { source: Source; state?: SourceState; threshold: number; onPress: () => void; onTogglePin?: () => void }) {
   const t = useTheme(); const snapshot = state?.snapshot; const primary = snapshot?.metrics[0];
   const secondary = snapshot?.metrics[1]; const stale = !!primary && isSampleStale(primary);
   const remaining = primary ? percentRemaining(primary) : undefined;
@@ -40,7 +40,15 @@ export function SourceCard({ source, state, threshold, onPress }: { source: Sour
         <View style={[styles.row, { gap: 11, flex: 1 }]}><ProviderMark source={source} />
           <View style={{ flex: 1 }}><Text numberOfLines={1} style={{ color: t.ink, fontSize: 15, fontWeight: '700', letterSpacing: -.25 }}>{source.name}</Text>
             <Text style={{ color: t.secondary, fontSize: 10, marginTop: 5, letterSpacing: .1 }}>{PROVIDER_LABELS[source.resolvedKind ?? source.kind]}</Text></View></View>
-        {state?.refreshing ? <ActivityIndicator size="small" color={t.accent} /> : <View style={[styles.row, { gap: 2 }]}><Text style={{ color: t.secondary, fontSize: 10 }}>详情</Text><ChevronRight size={14} color={t.muted} strokeWidth={1.5} /></View>}
+        <View style={[styles.row, { gap: 6 }]}>
+          {state?.refreshing ? <ActivityIndicator size="small" color={t.accent} /> : null}
+          {onTogglePin ? <Pressable accessibilityRole="button" accessibilityLabel={`${source.pinned ? '取消置顶' : '置顶'}${source.name}`} accessibilityState={{ selected: source.pinned }}
+            onPress={event => { event.stopPropagation(); onTogglePin(); }} hitSlop={4}
+            style={({ pressed }) => ({ minWidth: 44, minHeight: 44, paddingHorizontal: 9, gap: 4, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: source.pinned ? t.accentSoft : t.control, opacity: pressed ? .65 : 1 })}>
+            {source.pinned ? <PinOff size={15} color={t.accent} strokeWidth={1.7} /> : <Pin size={15} color={t.secondary} strokeWidth={1.7} />}
+            <Text style={{ color: source.pinned ? t.accent : t.secondary, fontSize: 9 }}>{source.pinned ? '已置顶' : '置顶'}</Text>
+          </Pressable> : <View style={[styles.row, { gap: 2 }]}><Text style={{ color: t.secondary, fontSize: 10 }}>详情</Text><ChevronRight size={14} color={t.muted} strokeWidth={1.5} /></View>}
+        </View>
       </View>
       <View style={{ gap: 10 }}>
         <View style={[styles.between, { alignItems: 'flex-end', gap: 10 }]}>

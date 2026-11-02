@@ -8,6 +8,16 @@ const integer = (value: unknown) => { const n = nonnegative(value); return n !==
 const label = (value: unknown) => string(value)?.slice(0, 160);
 
 export function parseAdminUsage(raw: unknown, source: Source, page: number, now: string): UsagePage {
+  if (!source.accountId) throw new QuotaError('CONFIG', '请先选择要查看记录的上游账号');
+  return parseSub2Usage(raw, { field: 'account_id', id: source.accountId }, page, now);
+}
+
+export function parseUserUsage(raw: unknown, credential: Credential, page: number, now: string): UsagePage {
+  if (!credential.apiKeyId || !credential.userId) throw new QuotaError('AUTH', '请登录站点并关联当前密钥');
+  return parseSub2Usage(raw, { field: 'api_key_id', id: credential.apiKeyId, userId: credential.userId }, page, now);
+}
+
+function parseSub2Usage(raw: unknown, scope: { field: 'account_id' | 'api_key_id'; id: number; userId?: number }, page: number, now: string): UsagePage {
   const data = unwrap(raw);
   if (!Array.isArray(data.items) || data.items.length > 200) throw new QuotaError('INVALID', '站点没有返回有效的使用记录列表');
   if (data.page !== undefined && integer(data.page) !== page) throw new QuotaError('INVALID', '站点返回的记录页码不一致，请刷新重试');
@@ -16,8 +26,10 @@ export function parseAdminUsage(raw: unknown, source: Source, page: number, now:
   const records: UsageRecord[] = data.items.map(row => {
     const item = object(row);
     const id = integer(item?.id);
-    // Reject the entire response if a fork ignores account_id; never show site-wide logs.
-    if (!item || !id || !source.accountId || integer(item.account_id) !== source.accountId) throw new QuotaError('INVALID', '记录与所选上游账号不一致，已停止显示');
+    // Reject forks that ignore the filter; never silently show wider-scope records.
+    if (!item || !id || integer(item[scope.field]) !== scope.id || (scope.userId !== undefined && integer(item.user_id) !== scope.userId)) {
+      throw new QuotaError('INVALID', scope.field === 'account_id' ? '记录与所选上游账号不一致，已停止显示' : '记录与当前密钥或登录账号不一致，已停止显示');
+    }
     const actual = nonnegative(item.actual_cost);
     const standard = nonnegative(item.total_cost);
     return {
@@ -91,7 +103,11 @@ export async function fetchUsage(source: Source, credential: Credential, page = 
       ]);
       return parseNewApiUsage(rows, status, now);
     }
-    if (kind === 'sub2api') throw new QuotaError('UNSUPPORTED', '套餐 API Key 只能查询额度，不能读取后台逐次记录。查看自有反代的记录，请使用「Sub2API 反代」连接。');
+    if (kind === 'sub2api') {
+      if (credential.mode !== 'session' || !credential.apiKeyId || !credential.userId) throw new QuotaError('AUTH', '登录购买套餐的站点账号后，即可查看当前密钥的使用记录。');
+      const query = `api_key_id=${credential.apiKeyId}&page=${page}&page_size=${USAGE_PAGE_SIZE}&sort_by=created_at&sort_order=desc`;
+      return parseUserUsage(await ask(source, `/api/v1/usage?${query}`, credential), credential, page, now);
+    }
     throw new QuotaError('UNSUPPORTED', '此接入方式暂未提供兼容的逐次使用记录接口。额度仍可在「额度」中查看。');
   } catch (error) {
     if (error instanceof QuotaError && error.code === 'FORBIDDEN') throw new QuotaError('FORBIDDEN', '当前凭据没有查看使用记录的权限，请检查站点权限或重新连接', error.status);

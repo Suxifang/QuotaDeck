@@ -11,9 +11,11 @@ export function PageRail({ index, onSelect, children }: PageRailProps) {
   const [offset] = useState(() => new Animated.Value(0));
   const reduceMotion = useReduceMotion();
   const previousWidth = useRef(0);
+  const dockTarget = useRef<number | undefined>(undefined);
   useEffect(() => {
     if (!width) return;
-    rail.current?.scrollTo({ x: index * width, animated: previousWidth.current === width && !reduceMotion });
+    rail.current?.scrollTo({ x: index * width, animated: dockTarget.current !== index && previousWidth.current === width && !reduceMotion });
+    dockTarget.current = undefined;
     previousWidth.current = width;
   }, [index, width, reduceMotion]);
   const progress = offset.interpolate({ inputRange: [0, Math.max(width, 1) * 2], outputRange: [0, 2], extrapolate: 'clamp' });
@@ -24,6 +26,10 @@ export function PageRail({ index, onSelect, children }: PageRailProps) {
       onMomentumScrollEnd={event => { if (width) onSelect(Math.round(event.nativeEvent.contentOffset.x / width)); }}>
       {width ? Children.map(children, (child, page) => <View key={page} style={{ width, height: '100%' }}>{child}</View>) : null}
     </Animated.ScrollView>
-    <LiquidDock index={index} progress={progress} onSelect={onSelect} />
+    <LiquidDock index={index} progress={progress} onSelect={next => {
+      dockTarget.current = next;
+      rail.current?.scrollTo({ x: next * width, animated: false });
+      onSelect(next);
+    }} />
   </View>;
 }

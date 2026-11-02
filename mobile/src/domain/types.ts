@@ -58,6 +58,9 @@ export interface Credential {
   accessToken?: string;
   refreshToken?: string;
   expiresAt?: string;
+  /** Only used by a separately stored site-user login for usage records. */
+  userId?: number;
+  apiKeyId?: number;
 }
 
 export interface SourceState {

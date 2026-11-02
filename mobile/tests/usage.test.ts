@@ -90,7 +90,7 @@ describe('usage requests and credentials', () => {
   });
   it('does not send a normal Sub2API key to a JWT-only log endpoint', async () => {
     const ask = vi.fn(async () => list());
-    await expect(fetchUsage({ ...source, kind: 'sub2api' }, key, 1, ask)).rejects.toMatchObject({ code: 'UNSUPPORTED' });
+    await expect(fetchUsage({ ...source, kind: 'sub2api' }, key, 1, ask)).rejects.toMatchObject({ code: 'AUTH' });
     expect(ask).not.toHaveBeenCalled();
     await expect(fetchUsage({ ...source, accountId: undefined }, key, 1, ask)).rejects.toMatchObject({ code: 'CONFIG' });
     expect(ask).not.toHaveBeenCalled();

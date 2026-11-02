@@ -71,8 +71,8 @@ export function Deck({ controller, tab }: { controller: QuotaController; tab: Ta
             </Pressable>)}</View>
             <View style={[styles.row, { gap: 5 }]}><View style={{ width: 4, height: 4, borderRadius: 3, backgroundColor: t.mint }} /><Text style={{ fontSize: 9, color: t.muted }}>前台自动更新</Text></View>
           </View>
-          <View style={{ gap: 15, marginTop: -7 }}>{sources.filter(source => filter === 'all' || source.pinned).map(source => <SourceCard key={source.id} source={source} state={data.states[source.id]} threshold={data.preferences.lowThreshold} onPress={() => { tap(data.preferences.haptics); setDetailId(source.id); }} />)}
-            {filter === 'pinned' && !sources.some(source => source.pinned) ? <Text style={{ color: t.secondary, textAlign: 'center', padding: 35, fontSize: 12 }}>在额度详情中置顶常用账号</Text> : null}
+          <View style={{ gap: 15, marginTop: -7 }}>{sources.filter(source => filter === 'all' || source.pinned).map(source => <SourceCard key={source.id} source={source} state={data.states[source.id]} threshold={data.preferences.lowThreshold} onTogglePin={controller.isDemo ? undefined : () => { tap(data.preferences.haptics); controller.changeSource(source.id, { pinned: !source.pinned }); }} onPress={() => { tap(data.preferences.haptics); setDetailId(source.id); }} />)}
+            {filter === 'pinned' && !sources.some(source => source.pinned) ? <Text style={{ color: t.secondary, textAlign: 'center', padding: 35, fontSize: 12 }}>点卡片右上角的图钉，置顶常用账号</Text> : null}
           </View>
           <Pressable accessibilityRole="button" onPress={add} style={[styles.row, { justifyContent: 'center', gap: 8, borderWidth: 1, borderStyle: 'dashed', borderColor: t.line, borderRadius: 21, paddingVertical: 19 }]}>
             <Plus size={16} color={t.secondary} /><Text style={{ color: t.secondary, fontSize: 12 }}>再连接一个站点</Text>

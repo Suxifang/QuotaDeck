@@ -26,18 +26,46 @@ export function saveData(data: SavedData): Promise<void> {
 }
 
 const keyFor = (connectionId: string) => `quotadeck.credential.${connectionId}`;
+const usageKey = (connectionId: string) => `quotadeck.usage-session.${connectionId}`;
+const secretWrites = new Map<string, Promise<void>>();
+function serializeSecret(id: string, operation: () => Promise<void>) {
+  const work = (secretWrites.get(id) ?? Promise.resolve()).catch(() => {}).then(operation);
+  secretWrites.set(id, work);
+  void work.finally(() => { if (secretWrites.get(id) === work) secretWrites.delete(id); }).catch(() => {});
+  return work;
+}
 export async function writeCredential(connectionId: string, credential: Credential): Promise<void> {
-  if (Platform.OS === 'web') { previewCredentials.set(connectionId, credential); return; }
-  await SecureStore.setItemAsync(keyFor(connectionId), JSON.stringify(credential), { keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY });
+  return putSecret(keyFor(connectionId), credential);
 }
 export async function readCredential(connectionId: string): Promise<Credential | undefined> {
-  if (Platform.OS === 'web') return previewCredentials.get(connectionId);
-  const json = await SecureStore.getItemAsync(keyFor(connectionId));
-  return json ? JSON.parse(json) as Credential : undefined;
+  return getSecret(keyFor(connectionId));
 }
 export async function deleteCredential(connectionId: string): Promise<void> {
-  previewCredentials.delete(connectionId);
-  if (Platform.OS !== 'web') await SecureStore.deleteItemAsync(keyFor(connectionId));
+  await Promise.all([removeSecret(keyFor(connectionId)), deleteUsageCredential(connectionId)]);
+}
+
+// A user JWT must never replace the API key used by /v1/usage.
+export const readUsageCredential = (id: string) => getSecret(usageKey(id));
+export const writeUsageCredential = (id: string, credential: Credential) => putSecret(usageKey(id), credential);
+export const deleteUsageCredential = (id: string) => removeSecret(usageKey(id));
+
+function putSecret(id: string, credential: Credential) {
+  return serializeSecret(id, async () => {
+    if (Platform.OS === 'web') { previewCredentials.set(id, credential); return; }
+    await SecureStore.setItemAsync(id, JSON.stringify(credential), { keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY });
+  });
+}
+async function getSecret(id: string): Promise<Credential | undefined> {
+  await secretWrites.get(id);
+  if (Platform.OS === 'web') return previewCredentials.get(id);
+  const json = await SecureStore.getItemAsync(id);
+  return json ? JSON.parse(json) as Credential : undefined;
+}
+function removeSecret(id: string) {
+  return serializeSecret(id, async () => {
+    previewCredentials.delete(id);
+    if (Platform.OS !== 'web') await SecureStore.deleteItemAsync(id);
+  });
 }
 
 export function configurationExport(data: SavedData): string {

@@ -5,7 +5,7 @@ import { QuotaError } from '../providers/transport';
 export function createUsageReader(deps: {
   source: (id: string) => Source | undefined;
   generation: (id: string) => number;
-  read: (id: string) => Promise<Credential | undefined>;
+  read: (id: string, source: Source) => Promise<Credential | undefined>;
   renew: (source: Source, credential: Credential) => Promise<Credential>;
   fetch: (source: Source, credential: Credential, page: number) => Promise<UsagePage>;
 }) {
@@ -19,9 +19,9 @@ export function createUsageReader(deps: {
         throw new QuotaError('AUTH', '连接已更换，请重新打开使用记录');
       }
     };
-    let credential = await deps.read(source.connectionId);
+    let credential = await deps.read(source.connectionId, source);
     check();
-    if (!credential) throw new QuotaError('AUTH', '请重新连接这个站点');
+    if (!credential) throw new QuotaError('AUTH', (source.resolvedKind ?? source.kind) === 'sub2api' ? '登录购买套餐的站点账号后，即可查看当前密钥的使用记录。' : '请重新连接这个站点');
     if (credential.mode === 'session' && (!credential.expiresAt || Date.parse(credential.expiresAt) <= Date.now() + 60_000)) credential = await deps.renew(source, credential);
     check();
     let result: UsagePage;

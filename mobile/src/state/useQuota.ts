@@ -6,12 +6,13 @@ import { isSampleStale } from '../domain/format';
 import { fetchSnapshot, refreshSession } from '../providers/registry';
 import { QuotaError } from '../providers/transport';
 import { createDemo } from './demo';
-import { deleteCredential, EMPTY_DATA, readCredential, readData, saveData, writeCredential } from './storage';
+import { deleteCredential, deleteUsageCredential, EMPTY_DATA, readCredential, readData, readUsageCredential, saveData, writeCredential, writeUsageCredential } from './storage';
 import { createSessionRenewal } from './session';
 import { syncWidgets } from '../widgets/sync';
 import type { WidgetSyncResult } from '../widgets/publisher';
 import { fetchUsage } from '../providers/usage';
 import { createUsageReader } from './usage-reader';
+import { loginUsageUser, refreshUsageUser, type UsageLoginInput } from '../providers/user-session';
 
 export function useQuota() {
   const [saved, setSaved] = useState<SavedData>(EMPTY_DATA);
@@ -25,7 +26,10 @@ export function useQuota() {
   const ref = useRef(saved);
   const refreshing = useRef(new Map<string, symbol>());
   const generations = useRef(new Map<string, number>());
+  const usageGenerations = useRef(new Map<string, number>());
+  const usageLogins = useRef(new Map<string, symbol>());
   const sessions = useRef(createSessionRenewal({ read: readCredential, write: writeCredential, refresh: refreshSession }));
+  const usageSessions = useRef(createSessionRenewal({ read: readUsageCredential, write: writeUsageCredential, refresh: refreshUsageUser }));
 
   const update = useCallback((change: (data: SavedData) => SavedData) => {
     const next = change(ref.current);
@@ -39,9 +43,33 @@ export function useQuota() {
 
   const loadUsage = useRef(createUsageReader({
     source: id => ref.current.sources.find(source => source.id === id),
-    generation: id => generations.current.get(id) ?? 0,
-    read: readCredential, renew, fetch: fetchUsage,
+    generation: id => usageGenerations.current.get(id) ?? 0,
+    read: (id, source) => (source.resolvedKind ?? source.kind) === 'sub2api' ? readUsageCredential(id) : readCredential(id),
+    renew: (source, credential) => (source.resolvedKind ?? source.kind) === 'sub2api' ? usageSessions.current.renew(source, credential) : renew(source, credential),
+    fetch: fetchUsage,
   })).current;
+
+  const connectUsage = useCallback(async (id: string, input: UsageLoginInput) => {
+    const source = ref.current.sources.find(item => item.id === id);
+    if (!source || (source.resolvedKind ?? source.kind) !== 'sub2api') throw new QuotaError('CONFIG', '这个连接不能使用站点账号登录');
+    const request = Symbol(id);
+    const generation = generations.current.get(source.connectionId) ?? 0;
+    usageLogins.current.set(source.connectionId, request);
+    const check = () => {
+      if (usageLogins.current.get(source.connectionId) !== request || (generations.current.get(source.connectionId) ?? 0) !== generation || !ref.current.sources.some(item => item.id === id && item.connectionId === source.connectionId)) throw new QuotaError('AUTH', '连接已更换，请重新打开使用记录');
+    };
+    const primary = await readCredential(source.connectionId);
+    check();
+    if (!primary?.apiKey || primary.mode !== 'key') throw new QuotaError('AUTH', '请先重新连接套餐 API Key');
+    const result = await loginUsageUser(source, primary.apiKey, input);
+    check();
+    if ('requiresTwoFactor' in result) return result;
+    usageSessions.current.invalidate(source.connectionId);
+    usageGenerations.current.set(source.connectionId, (usageGenerations.current.get(source.connectionId) ?? 0) + 1);
+    await writeUsageCredential(source.connectionId, result.credential);
+    check();
+    return { connected: true as const };
+  }, []);
 
   const refreshOne = useCallback(async (id: string) => {
     const source = ref.current.sources.find(item => item.id === id);
@@ -143,6 +171,9 @@ export function useQuota() {
     const unused = !ref.current.sources.some(item => item.id !== id && item.connectionId === source.connectionId);
     if (unused) {
       sessions.current.invalidate(source.connectionId);
+      usageSessions.current.invalidate(source.connectionId);
+      usageLogins.current.delete(source.connectionId);
+      usageGenerations.current.set(source.connectionId, (usageGenerations.current.get(source.connectionId) ?? 0) + 1);
       generations.current.set(source.connectionId, (generations.current.get(source.connectionId) ?? 0) + 1);
     }
     update(data => ({ ...data, sources: data.sources.filter(item => item.id !== id),
@@ -152,8 +183,11 @@ export function useQuota() {
 
   const reconnect = useCallback(async (connectionId: string, credential: Credential) => {
     sessions.current.invalidate(connectionId);
+    usageSessions.current.invalidate(connectionId);
+    usageLogins.current.delete(connectionId);
+    usageGenerations.current.set(connectionId, (usageGenerations.current.get(connectionId) ?? 0) + 1);
     generations.current.set(connectionId, (generations.current.get(connectionId) ?? 0) + 1);
-    await writeCredential(connectionId, credential);
+    await Promise.all([writeCredential(connectionId, credential), deleteUsageCredential(connectionId)]);
     const sources = ref.current.sources.filter(source => source.connectionId === connectionId);
     sources.forEach(source => refreshing.current.delete(source.id));
     await Promise.allSettled(sources.map(source => refreshOne(source.id)));
@@ -163,7 +197,7 @@ export function useQuota() {
   return { data: demo ? { ...demo, preferences: saved.preferences } : saved, saved, ready, storageError, widgetError, widgetSyncing, widgetSyncResult, publishWidgets,
     isDemo: !!demo, enterDemo: () => setDemo(createDemo()), exitDemo: () => setDemo(null),
     refreshAll: async () => { if (demo) setDemo(createDemo()); else await refreshAll(); },
-    refreshOne, loadUsage, addSources, changeSource, removeSource, reconnect, changePreferences,
+    refreshOne, loadUsage, connectUsage, addSources, changeSource, removeSource, reconnect, changePreferences,
     clearHistory: () => update(data => ({ ...data, history: {} })), DEFAULT_PREFERENCES };
 }
 

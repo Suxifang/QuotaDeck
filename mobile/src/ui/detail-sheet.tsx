@@ -46,7 +46,7 @@ export function DetailSheet({ source, controller, onClose, onReconnect }: { sour
   const [removeError, setRemoveError] = useState('');
   const [metricId, setMetricId] = useState<string>();
   const kind = source.resolvedKind ?? source.kind;
-  const [section, setSection] = useState<'overview' | 'usage' | 'manage'>(controller.isDemo || kind === 'sub2-admin' || kind === 'newapi' ? 'usage' : 'overview');
+  const [section, setSection] = useState<'overview' | 'usage' | 'manage'>(controller.isDemo || kind === 'sub2-admin' || kind === 'sub2api' || kind === 'newapi' ? 'usage' : 'overview');
   const [showHistory, setShowHistory] = useState(false);
   const state = controller.data.states[source.id]; const snapshot = state?.snapshot;
   const primary = snapshot?.metrics.find(metric => metric.id === metricId) ?? snapshot?.metrics[0];
@@ -83,7 +83,7 @@ export function DetailSheet({ source, controller, onClose, onReconnect }: { sour
       <View style={{ flex: 1 }}><Button title="打开站点" secondary icon={ExternalLink} disabled={demo} onPress={() => void Linking.openURL(source.baseUrl).catch(() => {})} /></View></View>
     <Pressable accessibilityRole="button" accessibilityLabel="每日余量快照" accessibilityState={{ expanded: showHistory }} onPress={() => setShowHistory(value => !value)} style={[styles.between, { paddingVertical: 12 }]}><Text style={{ color: t.ink, fontSize: 13, fontWeight: '600' }}>每日余量快照</Text><ChevronDown size={17} color={t.muted} style={{ transform: [{ rotate: showHistory ? '180deg' : '0deg' }] }} /></Pressable>
     </> : null}
-    {section === 'usage' ? <UsageRecords source={source} state={usage} onReconnect={() => onReconnect(source)} /> : null}
+    {section === 'usage' ? <UsageRecords source={source} state={usage} connectUsage={controller.connectUsage} onReconnect={() => onReconnect(source)} /> : null}
     {section === 'overview' && showHistory && primary ? <>
       <Glass subtle style={{ padding: 20, gap: 15 }}>
       <Text style={{ color: t.ink, fontSize: 14, fontWeight: '600' }}>近七天 · 余量记录</Text>
